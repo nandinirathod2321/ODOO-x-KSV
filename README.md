@@ -3,7 +3,8 @@
 > A full-stack B2B procurement ERP — RFQ management, vendor comparison, approvals, POs, invoicing, and activity tracking.
 
 ---
-
+DEPLOYED LINK 
+odoo-x-ksv-mu.vercel.app
 ## 🗂️ Project Structure
 
 ```
