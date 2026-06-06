@@ -1,0 +1,1 @@
+// Ensure PDF service has generic generatePDF method (it does from previous generation)

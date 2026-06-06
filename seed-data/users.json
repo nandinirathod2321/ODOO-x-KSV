@@ -1,0 +1,69 @@
+[
+  {
+    "email": "admin@vendorbridge.com",
+    "password": "admin123",
+    "name": "Admin User",
+    "role": "ADMIN"
+  },
+  {
+    "email": "officer@vendorbridge.com",
+    "password": "officer123",
+    "name": "Procurement Officer",
+    "role": "PROCUREMENT_OFFICER"
+  },
+  {
+    "email": "manager@vendorbridge.com",
+    "password": "manager123",
+    "name": "Manager User",
+    "role": "MANAGER"
+  },
+
+  {
+    "email": "contact@techcorp.in",
+    "password": "vendor123",
+    "name": "Tech Corp User",
+    "role": "VENDOR"
+  },
+  {
+    "email": "sales@softdev.in",
+    "password": "vendor123",
+    "name": "SoftDev User",
+    "role": "VENDOR"
+  },
+  {
+    "email": "orders@officeplus.in",
+    "password": "vendor123",
+    "name": "Office Plus User",
+    "role": "VENDOR"
+  },
+  {
+    "email": "info@speedylogistics.in",
+    "password": "vendor123",
+    "name": "Speedy Logistics User",
+    "role": "VENDOR"
+  },
+  {
+    "email": "admin@cleanspace.in",
+    "password": "vendor123",
+    "name": "CleanSpace User",
+    "role": "VENDOR"
+  },
+  {
+    "email": "hello@brandboost.in",
+    "password": "vendor123",
+    "name": "BrandBoost User",
+    "role": "VENDOR"
+  },
+  {
+    "email": "consult@legaleagle.in",
+    "password": "vendor123",
+    "name": "Legal Eagle User",
+    "role": "VENDOR"
+  },
+  {
+    "email": "advisor@stratagem.in",
+    "password": "vendor123",
+    "name": "Stratagem User",
+    "role": "VENDOR"
+  }
+]
