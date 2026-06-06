@@ -1,16 +1,18 @@
 {
   "name": "vendorbridge-backend",
   "version": "1.0.0",
-  "description": "VendorBridge Backend",
-  "main": "src/server.js",
+  "description": "VendorBridge ERP Backend — Node.js + TypeScript + Prisma + SQLite",
+  "main": "dist/server.js",
   "type": "module",
   "scripts": {
     "build": "tsc",
     "dev": "tsc && node --watch dist/server.js",
     "start": "node dist/server.js",
-    "db:migrate": "prisma migrate dev",
+    "setup": "npm install && npm run db:push && npm run db:seed",
+    "db:push": "npx prisma db push",
     "db:seed": "node prisma/seed.js",
-    "db:studio": "prisma studio"
+    "db:studio": "npx prisma studio",
+    "db:reset": "npx prisma db push --force-reset && node prisma/seed.js"
   },
   "dependencies": {
     "@prisma/client": "^5.0.0",

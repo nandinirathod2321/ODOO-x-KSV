@@ -1,0 +1,17 @@
+{
+  "name": "vendorbridge-erp",
+  "version": "1.0.0",
+  "description": "VendorBridge — Full-stack B2B Procurement ERP",
+  "private": true,
+  "scripts": {
+    "setup": "npm run setup:backend && npm run setup:frontend",
+    "setup:backend": "cd backend && cp .env.example .env 2>nul | true && npm install && npx prisma db push && node prisma/seed.js",
+    "setup:frontend": "cd frontend && npm install",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build:backend": "cd backend && npm run build",
+    "build:frontend": "cd frontend && npm run build",
+    "db:seed": "cd backend && node prisma/seed.js",
+    "db:reset": "cd backend && npx prisma db push --force-reset && node prisma/seed.js"
+  }
+}

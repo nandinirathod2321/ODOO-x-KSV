@@ -2,3 +2,6 @@ node_modules
 .env
 prisma/migrations
 *.pdf
+dist/
+prisma/dev.db
+prisma/*.db
