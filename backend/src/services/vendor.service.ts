@@ -1,3 +1,4 @@
+import { logActivity } from '../utils/logger.js';
 import { VendorRepository } from '../repositories/vendor.repository.js';
 import prisma from '../config/prisma.js';
 import { Prisma } from '@prisma/client';
@@ -5,8 +6,8 @@ import { Prisma } from '@prisma/client';
 export class VendorService {
   static async getAll(query: any) {
     const page = parseInt(query.page || '1');
-    const perPage = parseInt(query.perPage || '10');
-    const skip = (page - 1) * perPage;
+    const per_page = parseInt(query.per_page || '10');
+    const skip = (page - 1) * per_page;
 
     const where: Prisma.VendorWhereInput = {};
     if (query.search) {
@@ -24,15 +25,15 @@ export class VendorService {
       orderBy = { [query.sortBy]: query.sortDir === 'asc' ? 'asc' : 'desc' };
     }
 
-    const [total, data] = await VendorRepository.findMany({ skip, take: perPage, where, orderBy });
+    const [total, data] = await VendorRepository.findMany({ skip, take: per_page, where, orderBy });
     
     return {
       data,
       meta: {
         total,
         page,
-        perPage,
-        lastPage: Math.ceil(total / perPage)
+        per_page,
+        last_page: Math.ceil(total / per_page)
       }
     };
   }
@@ -60,15 +61,13 @@ export class VendorService {
       ...(data.categoryId ? { category: { connect: { id: data.categoryId } } } : {})
     });
 
-    await prisma.activityLog.create({
-      data: {
+    await logActivity({
         userId: adminId,
         eventType: 'vendor_created',
         entityType: 'Vendor',
         entityId: vendor.id,
         message: `Vendor ${vendor.name} was registered`
-      }
-    });
+      });
 
     await prisma.notification.create({
       data: {
@@ -85,15 +84,13 @@ export class VendorService {
   static async update(id: string, data: any, adminId: string) {
     const vendor = await VendorRepository.update(id, data);
     
-    await prisma.activityLog.create({
-      data: {
+    await logActivity({
         userId: adminId,
         eventType: 'vendor_updated',
         entityType: 'Vendor',
         entityId: vendor.id,
         message: `Vendor ${vendor.name} was updated`
-      }
-    });
+      });
     
     return vendor;
   }
@@ -107,30 +104,28 @@ export class VendorService {
       await prisma.user.update({ where: { id: vendor.userId }, data: { isActive: false } });
     }
 
-    await prisma.activityLog.create({
-      data: {
+    await logActivity({
         userId: adminId,
         eventType: 'vendor_deactivated',
         entityType: 'Vendor',
         entityId: vendor.id,
         message: `Vendor ${vendor.name} was deactivated`
-      }
-    });
+      });
   }
 
   static async getPerformance(id: string) {
     return await VendorRepository.getPerformanceMetrics(id);
   }
 
-  static async getRfqs(id: string, page: number, perPage: number) {
-    return await VendorRepository.findVendorRfqs(id, (page - 1) * perPage, perPage);
+  static async getRfqs(id: string, page: number, per_page: number) {
+    return await VendorRepository.findVendorRfqs(id, (page - 1) * per_page, per_page);
   }
 
-  static async getQuotations(id: string, page: number, perPage: number) {
-    return await VendorRepository.findVendorQuotations(id, (page - 1) * perPage, perPage);
+  static async getQuotations(id: string, page: number, per_page: number) {
+    return await VendorRepository.findVendorQuotations(id, (page - 1) * per_page, per_page);
   }
 
-  static async getPos(id: string, page: number, perPage: number) {
-    return await VendorRepository.findVendorPos(id, (page - 1) * perPage, perPage);
+  static async getPos(id: string, page: number, per_page: number) {
+    return await VendorRepository.findVendorPos(id, (page - 1) * per_page, per_page);
   }
 }

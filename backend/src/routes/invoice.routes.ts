@@ -8,12 +8,12 @@ const router = Router();
 
 router.use(authMiddleware);
 
-router.get('/', roleGuard(ROLES.ADMIN, ROLES.PROCUREMENT_OFFICER), InvoiceController.getAll);
-router.post('/generate', roleGuard(ROLES.ADMIN, ROLES.PROCUREMENT_OFFICER), InvoiceController.generate);
+router.get('/', roleGuard(ROLES.ADMIN, ROLES.PROCUREMENT_OFFICER, ROLES.MANAGER, ROLES.VENDOR), InvoiceController.getAll);
+router.post('/generate', roleGuard(ROLES.ADMIN, ROLES.PROCUREMENT_OFFICER, ROLES.MANAGER), InvoiceController.generate);
 
-router.get('/:id', roleGuard(ROLES.ADMIN, ROLES.PROCUREMENT_OFFICER, ROLES.VENDOR), InvoiceController.getById);
-router.patch('/:id/mark-paid', roleGuard(ROLES.ADMIN, ROLES.PROCUREMENT_OFFICER), InvoiceController.markPaid);
-router.get('/:id/pdf', roleGuard(ROLES.ADMIN, ROLES.PROCUREMENT_OFFICER, ROLES.VENDOR), InvoiceController.getPdf);
-router.post('/:id/send-email', roleGuard(ROLES.ADMIN, ROLES.PROCUREMENT_OFFICER), InvoiceController.sendEmail);
+router.get('/:id', roleGuard(ROLES.ADMIN, ROLES.PROCUREMENT_OFFICER, ROLES.MANAGER, ROLES.VENDOR), InvoiceController.getById);
+router.patch('/:id/mark-paid', roleGuard(ROLES.ADMIN, ROLES.PROCUREMENT_OFFICER, ROLES.MANAGER), InvoiceController.markPaid);
+router.get('/:id/pdf', roleGuard(ROLES.ADMIN, ROLES.PROCUREMENT_OFFICER, ROLES.MANAGER, ROLES.VENDOR), InvoiceController.getPdf);
+router.post('/:id/send-email', roleGuard(ROLES.ADMIN, ROLES.PROCUREMENT_OFFICER, ROLES.MANAGER, ROLES.VENDOR), InvoiceController.sendEmail);
 
 export default router;

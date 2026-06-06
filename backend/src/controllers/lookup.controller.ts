@@ -1,3 +1,5 @@
+import { successResponse, paginatedResponse } from '../utils/apiResponse.js';
+import { serializeData } from '../utils/serializer.js';
 import { Request, Response, NextFunction } from 'express';
 import { LookupService } from '../services/lookup.service.js';
 
@@ -5,7 +7,7 @@ export class LookupController {
   static async getVendorCategories(req: Request, res: Response, next: NextFunction) {
     try {
       const data = await LookupService.getVendorCategories();
-      res.json({ data });
+      successResponse(res, serializeData(data), 'OK');
     } catch (e) { next(e); }
   }
 
@@ -20,7 +22,7 @@ export class LookupController {
   static async getActivityEventTypes(req: Request, res: Response, next: NextFunction) {
     try {
       const data = await LookupService.getActivityEventTypes();
-      res.json(data);
+      successResponse(res, serializeData(data), 'OK');
     } catch (e) { next(e); }
   }
 }

@@ -8,7 +8,7 @@ const router = Router();
 
 router.use(authMiddleware);
 
-router.get('/', roleGuard(ROLES.ADMIN, ROLES.MANAGER), ActivityLogController.getAll);
-router.get('/event-types', roleGuard(ROLES.ADMIN, ROLES.MANAGER), ActivityLogController.getEventTypes);
+router.get('/', roleGuard(ROLES.ADMIN, ROLES.MANAGER, ROLES.PROCUREMENT_OFFICER), ActivityLogController.getAll);
+router.get('/event-types', roleGuard(ROLES.ADMIN, ROLES.MANAGER, ROLES.PROCUREMENT_OFFICER), ActivityLogController.getEventTypes);
 
 export default router;

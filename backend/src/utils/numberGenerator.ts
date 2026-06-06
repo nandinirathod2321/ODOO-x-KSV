@@ -1,4 +1,4 @@
-import prisma from '../config/prisma';
+import prisma from '../config/prisma.js';
 
 async function generateNextSequence(prefix: string, model: 'rFQ' | 'quotation' | 'purchaseOrder' | 'invoice', field: string): Promise<string> {
   const year = new Date().getFullYear();

@@ -1,8 +1,9 @@
+import { logActivity } from '../utils/logger.js';
 import bcrypt from 'bcrypt';
-import { AuthRepository } from '../repositories/auth.repository';
-import prisma from '../config/prisma';
-import { generateAccessToken } from '../utils/generateToken';
-import { PERMISSIONS, ROLES } from '../constants/permissions';
+import { AuthRepository } from '../repositories/auth.repository.js';
+import prisma from '../config/prisma.js';
+import { generateAccessToken } from '../utils/generateToken.js';
+import { PERMISSIONS, ROLES } from '../constants/permissions.js';
 
 export class AuthService {
   static async register(data: any) {
@@ -34,15 +35,13 @@ export class AuthService {
         });
       }
 
-      await tx.activityLog.create({
-        data: {
+      await logActivity({
           userId: user.id,
           eventType: 'user_registered',
           entityType: 'User',
           entityId: user.id,
           message: 'User registered successfully'
-        }
-      });
+        });
 
       await tx.notification.create({
         data: {
@@ -70,15 +69,13 @@ export class AuthService {
 
     const token = generateAccessToken({ id: user.id, email: user.email, role: user.role });
 
-    await prisma.activityLog.create({
-      data: {
+    await logActivity({
         userId: user.id,
         eventType: 'user_login',
         entityType: 'User',
         entityId: user.id,
         message: 'User logged in'
-      }
-    });
+      });
 
     if (user.role === ROLES.VENDOR) {
       await prisma.vendor.update({
@@ -140,14 +137,12 @@ export class AuthService {
     await AuthRepository.updatePassword(user.id, hashedPassword);
     await AuthRepository.deletePasswordResetOTP(otpRecord.id);
 
-    await prisma.activityLog.create({
-      data: {
+    await logActivity({
         userId: user.id,
         eventType: 'password_reset',
         entityType: 'User',
         entityId: user.id,
         message: 'Password reset successfully'
-      }
-    });
+      });
   }
 }

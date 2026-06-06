@@ -8,11 +8,12 @@ import { EmailService } from './email.service.js';
 export class InvoiceService {
   static async getAll(query: any) {
     const page = parseInt(query.page || '1');
-    const perPage = parseInt(query.perPage || '10');
-    const skip = (page - 1) * perPage;
+    const per_page = parseInt(query.per_page || '10');
+    const skip = (page - 1) * per_page;
 
     const where: Prisma.InvoiceWhereInput = {};
     if (query.status) where.status = query.status;
+    if (query.vendorId) where.vendorId = query.vendorId;
     if (query.search) {
       where.OR = [
         { invoiceNumber: { contains: query.search } },
@@ -23,8 +24,8 @@ export class InvoiceService {
     let orderBy: any = { createdAt: 'desc' };
     if (query.sortBy) orderBy = { [query.sortBy]: query.sortDir === 'asc' ? 'asc' : 'desc' };
 
-    const [total, data] = await InvoiceRepository.findMany({ skip, take: perPage, where, orderBy });
-    return { data, meta: { total, page, perPage, lastPage: Math.ceil(total / perPage) } };
+    const [total, data] = await InvoiceRepository.findMany({ skip, take: per_page, where, orderBy });
+    return { data, meta: { total, page, per_page, last_page: Math.ceil(total / per_page) } };
   }
 
   static async getById(id: string) {

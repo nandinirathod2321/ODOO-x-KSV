@@ -4,13 +4,13 @@ import { Prisma } from '@prisma/client';
 export class NotificationService {
   static async getAll(userId: string, query: any) {
     const page = parseInt(query.page || '1');
-    const perPage = parseInt(query.perPage || '20');
-    const skip = (page - 1) * perPage;
+    const per_page = parseInt(query.per_page || '20');
+    const skip = (page - 1) * per_page;
 
     const where: Prisma.NotificationWhereInput = { userId };
     if (query.isRead) where.isRead = query.isRead === 'true';
 
-    const [total, data] = await NotificationRepository.findMany({ skip, take: perPage, where });
+    const [total, data] = await NotificationRepository.findMany({ skip, take: per_page, where });
     const unreadCount = await NotificationRepository.countUnread(userId);
 
     return {
@@ -19,8 +19,8 @@ export class NotificationService {
         total,
         unreadCount,
         page,
-        perPage,
-        lastPage: Math.ceil(total / perPage) || 1
+        per_page,
+        last_page: Math.ceil(total / per_page) || 1
       }
     };
   }

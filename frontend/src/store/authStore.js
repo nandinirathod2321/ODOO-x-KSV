@@ -23,7 +23,7 @@ const useAuthStore = create(persist((set, get) => ({
   rehydrate: async () => {
     try {
       const { data } = await api.get('/auth/profile');
-      set({ user: data.data, role: data.data.role, permissions: data.data.permissions ?? [] });
+      set({ user: data.user, role: data.user.role, permissions: data.permissions ?? [] });
     } catch {
       get().logout();
     }

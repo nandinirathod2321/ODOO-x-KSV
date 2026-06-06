@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -224,7 +224,7 @@ model ActivityLog {
   entityType String
   entityId   String
   message    String
-  metadata   Json?
+  metadata   String?
   createdAt  DateTime @default(now())
 
   user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
@@ -249,7 +249,7 @@ model QuotationComparisonSnapshot {
   rfqId               String
   generatedBy         String
   recommendedVendorId String
-  comparisonScoreJson Json
+  comparisonScoreJson String
   createdAt           DateTime @default(now())
 
   rfq RFQ @relation(fields: [rfqId], references: [id], onDelete: Cascade)

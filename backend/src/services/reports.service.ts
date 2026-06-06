@@ -20,8 +20,8 @@ export class ReportsService {
   }
 
   static async exportReport(params: any) {
-    let data;
-    let title;
+    let data: any[] = [];
+    let title = '';
     
     if (params.type === 'vendor-performance') {
       data = await this.getVendorPerformance({ dateFrom: params.dateFrom, dateTo: params.dateTo });
@@ -33,6 +33,8 @@ export class ReportsService {
     } else if (params.type === 'monthly-trends') {
       data = await this.getMonthlyTrends(new Date().getFullYear().toString());
       title = 'Monthly Trends Report';
+    } else {
+      throw new Error('Invalid report type');
     }
 
     if (params.format === 'csv') {

@@ -1,3 +1,4 @@
+import { errorResponse } from '../utils/apiResponse.js';
 import { Request, Response, NextFunction } from 'express';
 import { ZodError } from 'zod';
 import { Prisma } from '@prisma/client';
@@ -8,7 +9,7 @@ export const globalErrorHandler = (err: any, req: Request, res: Response, next: 
   if (err instanceof ZodError) {
     return res.status(400).json({
       message: 'Validation failed',
-      errors: err.errors
+      errors: err.issues
     });
   }
 

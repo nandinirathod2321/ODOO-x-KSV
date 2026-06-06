@@ -1,3 +1,5 @@
+import { successResponse, paginatedResponse } from '../utils/apiResponse.js';
+import { serializeData } from '../utils/serializer.js';
 import { Request, Response, NextFunction } from 'express';
 import { ReportsService } from '../services/reports.service.js';
 import { vendorPerformanceSchema, spendingSummarySchema, monthlyTrendsSchema, reportExportSchema } from '../validators/reports.validator.js';
@@ -7,7 +9,7 @@ export class ReportsController {
     try {
       const filters = vendorPerformanceSchema.parse(req.query);
       const data = await ReportsService.getVendorPerformance(filters);
-      res.json({ data });
+      successResponse(res, serializeData(data), 'OK');
     } catch (e) { next(e); }
   }
 
@@ -15,7 +17,7 @@ export class ReportsController {
     try {
       const filters = spendingSummarySchema.parse(req.query);
       const result = await ReportsService.getSpendingSummary(filters);
-      res.json(result);
+      successResponse(res, serializeData(result), 'OK');
     } catch (e) { next(e); }
   }
 
@@ -23,14 +25,14 @@ export class ReportsController {
     try {
       const filters = monthlyTrendsSchema.parse(req.query);
       const data = await ReportsService.getMonthlyTrends(filters.year || '');
-      res.json(data);
+      successResponse(res, serializeData(data), 'OK');
     } catch (e) { next(e); }
   }
 
   static async getProcurementStats(req: Request, res: Response, next: NextFunction) {
     try {
       const data = await ReportsService.getProcurementStats();
-      res.json({ data });
+      successResponse(res, serializeData(data), 'OK');
     } catch (e) { next(e); }
   }
 

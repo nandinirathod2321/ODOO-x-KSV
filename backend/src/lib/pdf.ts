@@ -1,7 +1,7 @@
 import puppeteer from 'puppeteer';
 import { invoiceTemplate } from '../templates/invoice.html.js';
 
-export const generateInvoicePdf = async (invoice) => {
+export const generateInvoicePdf = async (invoice: any) => {
   let browser;
   try {
     browser = await puppeteer.launch({ args: ['--no-sandbox'] });

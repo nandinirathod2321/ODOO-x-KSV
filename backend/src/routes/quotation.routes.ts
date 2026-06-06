@@ -8,7 +8,7 @@ const router = Router();
 
 router.use(authMiddleware);
 
-router.get('/', roleGuard(ROLES.ADMIN, ROLES.MANAGER, ROLES.PROCUREMENT_OFFICER), QuotationController.getAll);
+router.get('/', roleGuard(ROLES.ADMIN, ROLES.MANAGER, ROLES.PROCUREMENT_OFFICER, ROLES.VENDOR), QuotationController.getAll);
 router.get('/compare/:rfqId', roleGuard(ROLES.ADMIN, ROLES.MANAGER, ROLES.PROCUREMENT_OFFICER), QuotationController.compare);
 router.get('/:id', QuotationController.getById);
 
@@ -16,5 +16,6 @@ router.post('/', roleGuard(ROLES.VENDOR), QuotationController.submit);
 router.patch('/:id', roleGuard(ROLES.VENDOR), QuotationController.update);
 
 router.patch('/:id/select-winner', roleGuard(ROLES.ADMIN, ROLES.PROCUREMENT_OFFICER), QuotationController.selectWinner);
+router.post('/simulate-bids/:rfqId', roleGuard(ROLES.ADMIN, ROLES.PROCUREMENT_OFFICER), QuotationController.simulateBids);
 
 export default router;

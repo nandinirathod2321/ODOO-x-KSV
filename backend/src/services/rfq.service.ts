@@ -1,3 +1,4 @@
+import { logActivity } from '../utils/logger.js';
 import { RFQRepository } from '../repositories/rfq.repository.js';
 import prisma from '../config/prisma.js';
 import { Prisma } from '@prisma/client';
@@ -7,8 +8,8 @@ import { ROLES } from '../constants/permissions.js';
 export class RFQService {
   static async getAll(query: any, userRole: string, userId: string) {
     const page = parseInt(query.page || '1');
-    const perPage = parseInt(query.perPage || '10');
-    const skip = (page - 1) * perPage;
+    const per_page = parseInt(query.per_page || '10');
+    const skip = (page - 1) * per_page;
 
     const where: Prisma.RFQWhereInput = {};
     if (query.search) {
@@ -25,7 +26,7 @@ export class RFQService {
         where.vendors = { some: { vendorId: vendor.id } };
         where.status = { in: ['PUBLISHED', 'QUOTATION_RECEIVED', 'AWARDED', 'CLOSED'] };
       } else {
-        return { data: [], meta: { total: 0, page, perPage, lastPage: 0 } };
+        return { data: [], meta: { total: 0, page, per_page, last_page: 0 } };
       }
     }
 
@@ -34,9 +35,9 @@ export class RFQService {
       orderBy = { [query.sortBy]: query.sortDir === 'asc' ? 'asc' : 'desc' };
     }
 
-    const [total, data] = await RFQRepository.findMany({ skip, take: perPage, where, orderBy });
+    const [total, data] = await RFQRepository.findMany({ skip, take: per_page, where, orderBy });
     
-    return { data, meta: { total, page, perPage, lastPage: Math.ceil(total / perPage) } };
+    return { data, meta: { total, page, per_page, last_page: Math.ceil(total / per_page) } };
   }
 
   static async getById(id: string) {
@@ -51,6 +52,7 @@ export class RFQService {
   static async create(data: any, adminId: string) {
     const rfqNumber = await generateRFQNumber();
     
+    // Run the main transaction without logActivity (which uses its own prisma connection)
     const rfq = await prisma.$transaction(async (tx) => {
       const newRfq = await tx.rFQ.create({
         data: {
@@ -75,16 +77,6 @@ export class RFQService {
         include: { items: true, vendors: true }
       });
 
-      await tx.activityLog.create({
-        data: {
-          userId: adminId,
-          eventType: 'rfq_created',
-          entityType: 'RFQ',
-          entityId: newRfq.id,
-          message: `RFQ ${rfqNumber} was created`
-        }
-      });
-
       for (const v of data.vendorIds) {
         const vendor = await tx.vendor.findUnique({ where: { id: v } });
         if (vendor && vendor.userId) {
@@ -104,6 +96,15 @@ export class RFQService {
       return newRfq;
     });
 
+    // Log AFTER transaction completes to avoid nested transaction timeout
+    await logActivity({
+      userId: adminId,
+      eventType: 'rfq_created',
+      entityType: 'RFQ',
+      entityId: rfq.id,
+      message: `RFQ ${rfqNumber} was created`
+    });
+
     return rfq;
   }
 
@@ -112,7 +113,7 @@ export class RFQService {
     if (!rfq) throw new Error('RFQ not found');
     if (rfq.status !== 'DRAFT') throw new Error('Only DRAFT RFQs can be updated');
 
-    return await prisma.$transaction(async (tx) => {
+    const updatedRfq = await prisma.$transaction(async (tx) => {
       if (data.items) {
         await tx.rFQItem.deleteMany({ where: { rfqId: id } });
         await tx.rFQItem.createMany({
@@ -136,7 +137,7 @@ export class RFQService {
         });
       }
 
-      const updatedRfq = await tx.rFQ.update({
+      return await tx.rFQ.update({
         where: { id },
         data: {
           title: data.title,
@@ -144,19 +145,18 @@ export class RFQService {
           deadline: data.deadline ? new Date(data.deadline) : undefined
         }
       });
-
-      await tx.activityLog.create({
-        data: {
-          userId: adminId,
-          eventType: 'rfq_updated',
-          entityType: 'RFQ',
-          entityId: id,
-          message: `RFQ ${rfq.rfqNumber} was updated`
-        }
-      });
-
-      return updatedRfq;
     });
+
+    // Log AFTER transaction completes
+    await logActivity({
+      userId: adminId,
+      eventType: 'rfq_updated',
+      entityType: 'RFQ',
+      entityId: id,
+      message: `RFQ ${rfq.rfqNumber} was updated`
+    });
+
+    return updatedRfq;
   }
 
   static async publish(id: string, adminId: string, io: any) {
@@ -164,20 +164,10 @@ export class RFQService {
     if (!rfq) throw new Error('RFQ not found');
     if (rfq.status !== 'DRAFT') throw new Error('Only DRAFT RFQs can be published');
 
-    return await prisma.$transaction(async (tx) => {
-      const updatedRfq = await tx.rFQ.update({
+    const updatedRfq = await prisma.$transaction(async (tx) => {
+      const updated = await tx.rFQ.update({
         where: { id },
         data: { status: 'PUBLISHED' }
-      });
-
-      await tx.activityLog.create({
-        data: {
-          userId: adminId,
-          eventType: 'rfq_published',
-          entityType: 'RFQ',
-          entityId: id,
-          message: `RFQ ${rfq.rfqNumber} was published`
-        }
       });
 
       const assignedVendors = await tx.rFQVendor.findMany({ where: { rfqId: id }, include: { vendor: true } });
@@ -197,22 +187,31 @@ export class RFQService {
         }
       }
 
-      if (io) io.emit('rfq_published', { rfqId: id, rfqNumber: rfq.rfqNumber });
-
-      return updatedRfq;
+      return updated;
     });
+
+    // Log & emit AFTER transaction completes
+    await logActivity({
+      userId: adminId,
+      eventType: 'rfq_published',
+      entityType: 'RFQ',
+      entityId: id,
+      message: `RFQ ${rfq.rfqNumber} was published`
+    });
+
+    if (io) io.emit('rfq_published', { rfqId: id, rfqNumber: rfq.rfqNumber });
+
+    return updatedRfq;
   }
 
   static async close(id: string, adminId: string) {
     const rfq = await prisma.rFQ.update({ where: { id }, data: { status: 'CLOSED' } });
-    await prisma.activityLog.create({
-      data: {
-        userId: adminId,
-        eventType: 'rfq_closed',
-        entityType: 'RFQ',
-        entityId: id,
-        message: `RFQ ${rfq.rfqNumber} was closed`
-      }
+    await logActivity({
+      userId: adminId,
+      eventType: 'rfq_closed',
+      entityType: 'RFQ',
+      entityId: id,
+      message: `RFQ ${rfq.rfqNumber} was closed`
     });
     return rfq;
   }

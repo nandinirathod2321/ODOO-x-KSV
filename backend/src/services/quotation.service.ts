@@ -6,8 +6,8 @@ import { generateQuotationNumber } from '../utils/numberGenerator.js';
 export class QuotationService {
   static async getAll(query: any) {
     const page = parseInt(query.page || '1');
-    const perPage = parseInt(query.perPage || '10');
-    const skip = (page - 1) * perPage;
+    const per_page = parseInt(query.per_page || '10');
+    const skip = (page - 1) * per_page;
 
     const where: Prisma.QuotationWhereInput = {};
     if (query.rfqId) where.rfqId = query.rfqId;
@@ -19,8 +19,8 @@ export class QuotationService {
       orderBy = { [query.sortBy]: query.sortDir === 'asc' ? 'asc' : 'desc' };
     }
 
-    const [total, data] = await QuotationRepository.findMany({ skip, take: perPage, where, orderBy });
-    return { data, meta: { total, page, perPage, lastPage: Math.ceil(total / perPage) } };
+    const [total, data] = await QuotationRepository.findMany({ skip, take: per_page, where, orderBy });
+    return { data, meta: { total, page, per_page, last_page: Math.ceil(total / per_page) } };
   }
 
   static async getById(id: string) {
@@ -175,7 +175,10 @@ export class QuotationService {
   }
 
   static async compare(rfqId: string, adminId: string) {
-    const rfq = await prisma.rFQ.findUnique({ where: { id: rfqId } });
+    const rfq = await prisma.rFQ.findUnique({
+      where: { id: rfqId },
+      include: { items: true }
+    });
     if (!rfq) throw new Error('RFQ not found');
 
     const quotations = await QuotationRepository.findAllByRfqForCompare(rfqId);
@@ -209,7 +212,7 @@ export class QuotationService {
         rfqId,
         generatedBy: adminId,
         recommendedVendorId: recommendedVendor.vendorId,
-        comparisonScoreJson: ranking as any
+        comparisonScoreJson: JSON.stringify(ranking)
       }
     });
 
@@ -275,5 +278,107 @@ export class QuotationService {
 
       return { quotation: winner, approval };
     });
+  }
+
+  static async simulateBids(rfqId: string, adminId: string, io: any) {
+    const rfq = await prisma.rFQ.findUnique({
+      where: { id: rfqId },
+      include: { items: true, vendors: { include: { vendor: true } } }
+    });
+    if (!rfq) throw new Error('RFQ not found');
+
+    // If it's a DRAFT, let's publish it first
+    if (rfq.status === 'DRAFT') {
+      await prisma.rFQ.update({
+        where: { id: rfqId },
+        data: { status: 'PUBLISHED' }
+      });
+      // create log
+      await prisma.activityLog.create({
+        data: {
+          userId: adminId,
+          eventType: 'rfq_published',
+          entityType: 'RFQ',
+          entityId: rfqId,
+          message: `RFQ ${rfq.rfqNumber} was published automatically during bid simulation`
+        }
+      });
+    }
+
+    const createdQuotations = [];
+    const paymentTermsOptions = ['Net 30', 'Net 45', '100% Advance', '50% Advance, 50% Delivery'];
+    
+    // Seed quotation for each invited vendor
+    for (const rfqVendor of rfq.vendors) {
+      const vendor = rfqVendor.vendor;
+      // check if quotation already exists
+      const existing = await prisma.quotation.findFirst({
+        where: { rfqId, vendorId: vendor.id }
+      });
+      if (existing) continue;
+
+      const quotationNumber = await generateQuotationNumber();
+      const deliveryDays = 10 + Math.floor(Math.random() * 20); // 10 to 30 days
+      const validityDate = new Date();
+      validityDate.setDate(validityDate.getDate() + 30); // 30 days validity
+      const paymentTerms = paymentTermsOptions[Math.floor(Math.random() * paymentTermsOptions.length)];
+
+      let totalAmount = 0;
+      const itemsData = rfq.items.map(item => {
+        const basePrice = 2000 + (item.quantity % 5) * 1500;
+        const unitPrice = parseFloat((basePrice * (0.85 + Math.random() * 0.3)).toFixed(2));
+        const taxPercent = 18;
+        const lineTotal = parseFloat((item.quantity * unitPrice * 1.18).toFixed(2));
+        totalAmount += lineTotal;
+
+        return {
+          rfqItemId: item.id,
+          description: item.description,
+          quantity: item.quantity,
+          unit: item.unit,
+          unitPrice,
+          taxPercent,
+          lineTotal
+        };
+      });
+
+      const quotation = await prisma.quotation.create({
+        data: {
+          quotationNumber,
+          rfqId,
+          vendorId: vendor.id,
+          deliveryDays,
+          validityDate,
+          paymentTerms,
+          notes: `Simulated quote from ${vendor.name}`,
+          totalAmount: parseFloat(totalAmount.toFixed(2)),
+          status: 'SUBMITTED',
+          items: { create: itemsData }
+        },
+        include: { items: true, vendor: true }
+      });
+
+      createdQuotations.push(quotation);
+
+      await prisma.activityLog.create({
+        data: {
+          userId: adminId,
+          eventType: 'quotation_submitted',
+          entityType: 'Quotation',
+          entityId: quotation.id,
+          message: `Quotation ${quotationNumber} submitted automatically for ${vendor.name}`
+        }
+      });
+    }
+
+    if (createdQuotations.length > 0) {
+      await prisma.rFQ.update({
+        where: { id: rfqId },
+        data: { status: 'QUOTATION_RECEIVED' }
+      });
+      if (io) io.emit('rfq_status_changed', { rfqId, status: 'QUOTATION_RECEIVED' });
+    }
+
+    return createdQuotations;
   }
 }

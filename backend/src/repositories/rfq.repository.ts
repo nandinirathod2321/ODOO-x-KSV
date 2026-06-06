@@ -16,7 +16,6 @@ export class RFQRepository {
         where: params.where,
         orderBy: params.orderBy,
         include: {
-          createdBy: { select: { id: true, name: true } },
           _count: { select: { items: true, vendors: true, quotations: true } }
         }
       })

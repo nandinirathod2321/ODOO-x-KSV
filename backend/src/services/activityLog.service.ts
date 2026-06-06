@@ -4,8 +4,8 @@ import { Prisma } from '@prisma/client';
 export class ActivityLogService {
   static async getAll(query: any) {
     const page = parseInt(query.page || '1');
-    const perPage = parseInt(query.perPage || '10');
-    const skip = (page - 1) * perPage;
+    const per_page = parseInt(query.per_page || '10');
+    const skip = (page - 1) * per_page;
 
     const where: Prisma.ActivityLogWhereInput = {};
     if (query.search) where.message = { contains: query.search };
@@ -19,8 +19,8 @@ export class ActivityLogService {
 
     const orderBy: any = { createdAt: query.sortDir === 'asc' ? 'asc' : 'desc' };
 
-    const [total, data] = await ActivityLogRepository.findMany({ skip, take: perPage, where, orderBy });
-    return { data, meta: { total, page, perPage, lastPage: Math.ceil(total / perPage) } };
+    const [total, data] = await ActivityLogRepository.findMany({ skip, take: per_page, where, orderBy });
+    return { data, meta: { total, page, per_page, last_page: Math.ceil(total / per_page) } };
   }
 
   static async getEventTypes() {
