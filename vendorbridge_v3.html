@@ -1,0 +1,1483 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Inter',system-ui,sans-serif}
+:root{
+--bg:#f5f6fa;--surface:#fff;--border:#e2e5ea;--border2:#c8cdd6;
+--text:#1a1d23;--text2:#5a6272;--text3:#9aa0ad;
+--primary:#16a34a;--primary-light:#dcfce7;--primary-dark:#15803d;
+--red:#dc2626;--red-light:#fef2f2;
+--amber:#d97706;--amber-light:#fffbeb;
+--blue:#2563eb;--blue-light:#eff6ff;
+--purple:#7c3aed;--purple-light:#f5f3ff;
+--sidebar:#1e2330;--sidebar-text:#a8b3c4;--sidebar-active:#16a34a;
+--shadow:0 1px 3px rgba(0,0,0,0.08);
+--radius:8px;--radius-lg:12px;
+}
+html,
+body,
+#app{
+  width:100%;
+  height:100vh;
+  margin:0;
+}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-size:13px;
+  display:flex;
+  overflow:hidden;
+}
+.sidebar{width:200px;background:var(--sidebar);display:flex;flex-direction:column;flex-shrink:0}
+.logo-wrap{padding:16px 16px 12px;border-bottom:1px solid rgba(255,255,255,0.07)}
+.logo-brand{font-size:15px;font-weight:700;color:#fff;letter-spacing:-0.3px}
+.logo-tag{font-size:10px;color:#5a6a7a;margin-top:2px}
+.nav-section{padding:8px 0}
+.nav-label{padding:8px 16px 4px;font-size:10px;font-weight:600;color:#3d4f66;text-transform:uppercase;letter-spacing:0.8px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:7px 16px;cursor:pointer;color:var(--sidebar-text);font-size:12px;font-weight:500;border-left:3px solid transparent;transition:all 0.12s}
+.nav-item:hover{color:#fff;background:rgba(255,255,255,0.05)}
+.nav-item.active{color:#fff;background:rgba(22,163,74,0.15);border-left-color:var(--primary)}
+.nav-icon{font-size:15px;opacity:0.8;flex-shrink:0}
+.nav-badge{margin-left:auto;background:#dc2626;color:#fff;font-size:9px;padding:1px 6px;border-radius:10px;font-weight:700}
+.nav-badge.green{background:var(--primary)}
+.sb-footer{margin-top:auto;padding:12px 16px;border-top:1px solid rgba(255,255,255,0.07)}
+.sb-avatar{width:32px;height:32px;border-radius:50%;background:var(--primary);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.sb-user{display:flex;align-items:center;gap:9px}
+.sb-name{font-size:12px;color:#fff;font-weight:600}
+.sb-role{font-size:10px;color:#5a6a7a}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.topbar{height:52px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0;box-shadow:var(--shadow)}
+.tb-title{font-size:15px;font-weight:700;color:var(--text)}
+.tb-crumb{font-size:11px;color:var(--text3);padding:3px 8px;background:var(--bg);border-radius:4px}
+.tb-spacer{flex:1}
+.tb-time{font-size:11px;color:var(--text3)}
+.content{flex:1;overflow-y:auto;padding:20px;background:var(--bg)}
+.content::-webkit-scrollbar{width:4px}
+.content::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:4px}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:var(--radius);font-size:12px;font-weight:600;cursor:pointer;border:1px solid transparent;transition:all 0.12s;font-family:inherit}
+.btn:active{transform:scale(0.97)}
+.btn-primary{background:var(--primary);color:#fff;border-color:var(--primary-dark)}
+.btn-primary:hover{background:var(--primary-dark)}
+.btn-danger{background:var(--red);color:#fff;border-color:#b91c1c}
+.btn-danger:hover{background:#b91c1c}
+.btn-amber{background:var(--amber);color:#fff;border-color:#b45309}
+.btn-amber:hover{background:#b45309}
+.btn-outline{background:#fff;color:var(--text);border-color:var(--border2)}
+.btn-outline:hover{background:var(--bg);border-color:var(--border2)}
+.btn-ghost{background:transparent;color:var(--text2);border-color:transparent}
+.btn-ghost:hover{background:var(--bg);color:var(--text)}
+.btn-sm{padding:4px 10px;font-size:11px}
+.btn-xs{padding:2px 8px;font-size:10px}
+.btn-icon{padding:6px;border-radius:var(--radius)}
+
+/* KPI CARDS */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;position:relative;overflow:hidden}
+.kpi-icon{width:36px;height:36px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:16px;margin-bottom:10px}
+.kpi-val{font-size:22px;font-weight:700;color:var(--text)}
+.kpi-label{font-size:11px;color:var(--text2);margin-bottom:4px}
+.kpi-delta{font-size:11px;margin-top:4px;font-weight:500}
+.kpi-accent{position:absolute;top:0;right:0;width:4px;height:100%;border-radius:0 var(--radius-lg) var(--radius-lg) 0}
+
+/* TABLES */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:16px}
+.card-head{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:#fff}
+.card-title{font-size:13px;font-weight:700;color:var(--text)}
+.card-sub{font-size:11px;color:var(--text3)}
+.card-actions{margin-left:auto;display:flex;gap:8px;align-items:center}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:11px;color:var(--text2);padding:9px 14px;border-bottom:1px solid var(--border);background:#fafbfc;font-weight:600;white-space:nowrap}
+td{padding:9px 14px;border-bottom:1px solid var(--border);font-size:12px;color:var(--text);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tbody tr:hover{background:#fafbff}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;white-space:nowrap}
+.badge-green{background:var(--primary-light);color:#15803d}
+.badge-red{background:var(--red-light);color:var(--red)}
+.badge-amber{background:var(--amber-light);color:var(--amber)}
+.badge-blue{background:var(--blue-light);color:var(--blue)}
+.badge-purple{background:var(--purple-light);color:var(--purple)}
+.badge-gray{background:#f3f4f6;color:#6b7280}
+
+/* FORMS */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px}
+.form-full{grid-column:1/-1}
+.form-group{display:flex;flex-direction:column;gap:4px}
+.form-label{font-size:11px;font-weight:600;color:var(--text2)}
+.form-input{background:#fff;border:1px solid var(--border2);border-radius:var(--radius);padding:7px 10px;font-size:12px;color:var(--text);font-family:inherit;width:100%;outline:none;transition:border-color 0.15s}
+.form-input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(22,163,74,0.1)}
+select.form-input{cursor:pointer}
+textarea.form-input{resize:vertical}
+
+/* MODAL */
+.modal-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.35);display:flex;align-items:center;justify-content:center;z-index:100}
+.modal{background:#fff;border-radius:var(--radius-lg);width:520px;max-height:80%;overflow-y:auto;box-shadow:0 8px 30px rgba(0,0,0,0.15)}
+.modal-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-size:14px;font-weight:700}
+.modal-body{padding:20px}
+.modal-foot{padding:14px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;background:#fafbfc}
+
+/* STEPPER */
+.stepper{display:flex;align-items:center;gap:0;margin-bottom:20px}
+.step-item{display:flex;align-items:center}
+.step-circle{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;border:2px solid var(--border2);color:var(--text3);background:#fff;flex-shrink:0;cursor:pointer}
+.step-circle.active{background:var(--primary);border-color:var(--primary);color:#fff}
+.step-circle.done{background:var(--primary-light);border-color:var(--primary);color:var(--primary)}
+.step-label{margin-left:8px;font-size:12px;color:var(--text2);font-weight:500}
+.step-label.active{color:var(--primary);font-weight:700}
+.step-line{flex:1;height:2px;background:var(--border);margin:0 12px}
+.step-line.done{background:var(--primary)}
+
+/* TIMELINE */
+.tl-wrap{padding:16px}
+.tl-item{display:flex;gap:12px;margin-bottom:18px}
+.tl-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;color:var(--text3)}
+.tl-dot.green{border-color:var(--primary);background:var(--primary-light);color:var(--primary)}
+.tl-dot.amber{border-color:var(--amber);background:var(--amber-light);color:var(--amber)}
+.tl-dot.blue{border-color:var(--blue);background:var(--blue-light);color:var(--blue)}
+.tl-dot.gray{border-color:var(--border2);background:var(--bg)}
+.tl-line-wrap{position:relative;display:flex;flex-direction:column;align-items:center}
+.tl-vline{width:2px;flex:1;background:var(--border);margin-top:4px;min-height:20px}
+.tl-right{flex:1}
+.tl-title{font-size:12px;font-weight:700;color:var(--text)}
+.tl-meta{font-size:11px;color:var(--text3);margin-top:1px}
+.tl-body{font-size:11px;color:var(--text2);margin-top:6px;padding:8px 10px;background:var(--bg);border-radius:var(--radius);border-left:3px solid var(--border2)}
+
+/* BAR CHART */
+.chart-wrap{padding:16px}
+.chart-bars{display:flex;align-items:flex-end;gap:8px;height:100px}
+.bar-col{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1}
+.bar-fill{width:100%;background:var(--primary-light);border-radius:4px 4px 0 0;transition:background 0.2s;border:1px solid #bbf7d0;min-height:4px}
+.bar-fill:hover{background:var(--primary)}
+.bar-fill.highlight{background:var(--primary);border-color:var(--primary-dark)}
+.bar-val{font-size:9px;color:var(--text2)}
+.bar-label{font-size:10px;color:var(--text3)}
+
+/* COMPARISON TABLE */
+.comp-wrap{overflow-x:auto}
+.comp-table{border-collapse:collapse;width:100%;min-width:500px}
+.comp-table th,.comp-table td{border:1px solid var(--border);padding:8px 12px;font-size:12px}
+.comp-table th{background:#fafbfc;font-weight:600;text-align:center;font-size:11px}
+.comp-table th:first-child,.comp-table td:first-child{text-align:left;background:#fafbfc;color:var(--text2);font-weight:600}
+.comp-winner{background:#f0fdf4!important;color:#15803d!important;font-weight:700}
+.comp-header-winner{background:#dcfce7!important;color:#15803d!important;border-color:#86efac!important}
+.comp-table tbody tr:hover td{background:#f9fafb}
+
+/* SPLIT */
+.split{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px}
+.split-3{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+/* TOASTS */
+.toast-area{position:absolute;bottom:16px;right:16px;z-index:200;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{background:#1e2330;color:#fff;padding:10px 16px;border-radius:var(--radius);font-size:12px;font-weight:500;display:flex;align-items:center;gap:8px;pointer-events:auto;animation:slideIn 0.2s ease;max-width:280px}
+.toast.success{border-left:4px solid var(--primary)}
+.toast.error{border-left:4px solid var(--red)}
+.toast.info{border-left:4px solid var(--blue)}
+@keyframes slideIn{from{transform:translateX(20px);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* PROGRESS BAR */
+.prog-bar{height:6px;background:var(--border);border-radius:4px;overflow:hidden}
+.prog-fill{height:100%;border-radius:4px;background:var(--primary)}
+
+/* INVOICE PRINT */
+.inv-wrap{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;margin-bottom:16px}
+.inv-header{display:flex;justify-content:space-between;margin-bottom:20px;padding-bottom:16px;border-bottom:2px solid var(--border)}
+
+/* FILTER CHIPS */
+.chip-row{display:flex;gap:6px;flex-wrap:wrap}
+.chip{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:#fff;color:var(--text2);transition:all 0.12s}
+.chip:hover{border-color:var(--primary);color:var(--primary)}
+.chip.active{background:var(--primary-light);border-color:var(--primary);color:#15803d;font-weight:600}
+
+/* QUICK ACTIONS */
+.qa-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px}
+.qa-btn{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 8px;text-align:center;cursor:pointer;transition:all 0.15s}
+.qa-btn:hover{border-color:var(--primary);background:var(--primary-light)}
+.qa-btn:hover .qa-icon{color:var(--primary)}
+.qa-icon{font-size:20px;color:var(--text2);margin-bottom:6px}
+.qa-text{font-size:11px;font-weight:600;color:var(--text2)}
+
+/* SPEND BAR */
+.spend-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.spend-row:last-child{border-bottom:none}
+.spend-label{font-size:12px;color:var(--text);width:100px;flex-shrink:0}
+.spend-bar-bg{flex:1;height:8px;background:var(--bg);border-radius:4px;overflow:hidden}
+.spend-bar-fill{height:100%;border-radius:4px;background:var(--primary)}
+.spend-amount{font-size:12px;font-weight:600;color:var(--primary);width:50px;text-align:right}
+
+/* ALERT */
+.alert{border-radius:var(--radius);padding:10px 14px;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px}
+.alert-red{background:var(--red-light);border:1px solid #fecaca}
+.alert-amber{background:var(--amber-light);border:1px solid #fde68a}
+.alert-green{background:var(--primary-light);border:1px solid #bbf7d0}
+
+/* TABS */
+.tab-row{display:flex;border-bottom:2px solid var(--border);margin-bottom:16px;gap:0}
+.tab-btn{padding:8px 16px;font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;background:none;border-top:none;border-left:none;border-right:none;font-family:inherit;transition:all 0.12s}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--primary);border-bottom-color:var(--primary)}
+
+/* SEARCH */
+.search-wrap{position:relative;flex:1}
+.search-wrap input{padding-left:32px}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:14px}
+
+/* WORKFLOW STEPS */
+.wf-step{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.wf-step:last-child{border-bottom:none}
+.wf-circle{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;font-weight:700}
+
+/* APP SHELL POSITIONING */
+.app-shell{position:relative;flex:1;display:flex;min-width:0}
+</style>
+
+<div id="app"
+     style="
+     display:flex;
+     width:100%;
+     height:100vh;
+     overflow:hidden;
+     background:var(--bg);
+     position:relative;">
+
+<div class="sidebar" id="sidebar">
+  <div class="logo-wrap">
+    <div class="logo-brand">VendorBridge</div>
+    <div class="logo-tag">Procurement ERP · v2.0</div>
+  </div>
+  <div class="nav-section" id="sidebar-nav">
+    <!-- dynamically populated by buildSidebar() -->
+  </div>
+  <div class="sb-footer">
+    <div class="sb-user">
+      <div class="sb-avatar" id="sb-avatar">RS</div>
+      <div>
+        <div class="sb-name" id="sb-name">Riya Sharma</div>
+        <div class="sb-role" id="sb-role">Procurement Officer</div>
+      </div>
+    </div>
+    <button class="btn btn-outline btn-sm" style="width:100%;margin-top:10px;font-size:11px" onclick="nav('login')">Sign out</button>
+  </div>
+</div>
+
+<div class="app-shell">
+  <div class="main" id="main-panel">
+    <div class="topbar" id="topbar">
+      <div>
+        <div class="tb-title" id="tb-title">Dashboard</div>
+      </div>
+      <div class="tb-spacer"></div>
+      <span class="tb-time">06 Jun 2026, 09:41 AM</span>
+      <button class="btn btn-primary btn-sm" id="tb-cta" onclick="tbAction()"><i class="ti ti-plus"></i> New RFQ</button>
+    </div>
+    <div class="content" id="content"></div>
+  </div>
+  <div id="modal-root"></div>
+  <div class="toast-area" id="toasts"></div>
+</div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const pages = {};
+let currentPage = 'dashboard';
+let rfqItems = [
+  {id:1,name:'Ergonomic Chair (High-Back)',unit:'Nos',qty:20,price:8000,note:'ISO certified'},
+  {id:2,name:'Height-Adj. Workstation',unit:'Nos',qty:10,price:12500,note:'With cable mgmt'},
+  {id:3,name:'Meeting Table (8-seater)',unit:'Nos',qty:3,price:22000,note:'Laminate finish'}
+];
+let rfqStep = 1;
+let vendors = [
+  {id:1,name:'InfraSupplies Pvt Ltd',email:'infra@supplies.com',cat:'IT Hardware',gst:'29AABCI1234J1Z5',phone:'+91 98765 43210',rating:4.1,status:'Active'},
+  {id:2,name:'TechCorp Ltd',email:'vendor@techcorp.in',cat:'IT Hardware',gst:'27AABCT5678K1Z2',phone:'+91 90123 45678',rating:4.8,status:'Active'},
+  {id:3,name:'OfficeEssentials Co.',email:'sales@officeess.com',cat:'Stationery',gst:'06AABCO9012L1Z8',phone:'+91 70987 65432',rating:3.2,status:'Pending'},
+  {id:4,name:'FurniMax Solutions',email:'info@furnimax.com',cat:'Furniture',gst:'33AABCF3456M1Z1',phone:'+91 81234 56789',rating:4.3,status:'Active'},
+  {id:5,name:'QuickLogix Transport',email:'ops@quicklogix.com',cat:'Logistics',gst:'21AABCQ7890N1Z6',phone:'+91 77654 32109',rating:2.1,status:'Blacklisted'}
+];
+let vendorFilter = 'All';
+let activityFilter = 'All';
+let quoteStatus = {FurniMax:'Submitted',InfraSupplies:'Draft',OfficeEssentials:'Not started'};
+let quotePrices = {chair:7200,workstation:11500,table:20000};
+let currentRole = 'Procurement Officer';
+let invoices = [
+  {id:'INV-0082',po:'PO-2129',vendor:'InfraSupplies',amount:'₹3,79,071',due:'06 Jul 2026',status:'Pending'},
+  {id:'INV-0081',po:'PO-2128',vendor:'TechCorp Ltd',amount:'₹1,46,910',due:'14 Jun 2026',status:'Overdue'},
+  {id:'INV-0080',po:'PO-2127',vendor:'FurniMax',amount:'₹1,03,840',due:'10 May 2026',status:'Paid'}
+];
+let vendorShortlist = {FurniMax:null,InfraSupplies:null,OfficeEssentials:null};
+let approvalPending = [
+  {id:'RFQ-042',cat:'Furniture',vendor:'InfraSupplies',amount:'₹3,78,780',priority:'Urgent',status:'Pending'},
+  {id:'RFQ-041',cat:'Stationery',vendor:'OfficeEssentials',amount:'₹48,200',priority:'Normal',status:'Pending'}
+];
+
+function toast(msg, type='success') {
+  const area = $('toasts');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  const icon = type==='success'?'✓':type==='error'?'✗':'ℹ';
+  t.innerHTML = `<span>${icon}</span><span>${msg}</span>`;
+  area.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(20px)';setTimeout(()=>t.remove(),300)},3000);
+}
+
+function showModal(html) {
+  const root = $('modal-root');
+  root.innerHTML = `<div class="modal-overlay" onclick="if(event.target===this)closeModal()">${html}</div>`;
+}
+function closeModal() { $('modal-root').innerHTML=''; }
+
+// Role-based nav config
+const ROLE_NAV = {
+  'Procurement Officer': [
+    {page:'dashboard',icon:'ti-layout-dashboard',label:'Dashboard'},
+    {page:'vendors',icon:'ti-building-store',label:'Vendors'},
+    {page:'rfqs',icon:'ti-file-description',label:'RFQs',badge:'green',badgeVal:'3'},
+    {page:'quotations',icon:'ti-receipt',label:'Quotations'},
+    {page:'comparison',icon:'ti-table',label:'Comparison'},
+    {page:'pos',icon:'ti-package',label:'Purchase Orders'},
+    {page:'invoices',icon:'ti-file-invoice',label:'Invoices'},
+    {page:'activity',icon:'ti-timeline',label:'Activity'},
+  ],
+  'Manager / Approver': [
+    {page:'dashboard',icon:'ti-layout-dashboard',label:'Dashboard'},
+    {page:'approvals',icon:'ti-checks',label:'Approvals',badge:'',badgeVal:'2'},
+    {page:'rfqs',icon:'ti-file-description',label:'RFQs'},
+    {page:'pos',icon:'ti-package',label:'Purchase Orders'},
+    {page:'reports',icon:'ti-chart-bar',label:'Reports'},
+    {page:'activity',icon:'ti-timeline',label:'Activity'},
+  ],
+  'Vendor': [
+    {page:'dashboard',icon:'ti-layout-dashboard',label:'Dashboard'},
+    {page:'quotations',icon:'ti-receipt',label:'Submit Quotation'},
+    {page:'rfqs',icon:'ti-file-description',label:'Open RFQs'},
+    {page:'pos',icon:'ti-package',label:'My Purchase Orders'},
+  ],
+  'Admin': [
+    {page:'dashboard',icon:'ti-layout-dashboard',label:'Dashboard'},
+    {page:'vendors',icon:'ti-building-store',label:'Vendor Management'},
+    {page:'reports',icon:'ti-chart-bar',label:'Analytics'},
+    {page:'activity',icon:'ti-timeline',label:'Audit Log'},
+  ]
+};
+
+const ROLE_TOPBAR_CTA = {
+  'Procurement Officer': {dashboard:'New RFQ',vendors:'Add Vendor',rfqs:'Save Draft',quotations:null,comparison:'Send for Approval',pos:null,invoices:null,activity:null},
+  'Manager / Approver': {dashboard:null,approvals:null,rfqs:null,pos:null,reports:'Export',activity:null},
+  'Vendor': {dashboard:null,quotations:'Submit Quote',rfqs:null,pos:null},
+  'Admin': {dashboard:null,vendors:'Add Vendor',reports:'Export',activity:null}
+};
+
+function buildSidebar(){
+  const items = ROLE_NAV[currentRole]||ROLE_NAV['Procurement Officer'];
+  const sb = $('sidebar-nav');
+  if(!sb) return;
+  sb.innerHTML = items.map(it=>`<div class="nav-item ${it.page===currentPage?'active':''}" data-page="${it.page}" onclick="nav('${it.page}')"><i class="ti ${it.icon} nav-icon"></i>${it.label}${it.badge!==undefined?`<span class="nav-badge ${it.badge}">${it.badgeVal}</span>`:''}</div>`).join('');
+}
+
+function nav(page) {
+  currentPage = page;
+  buildSidebar();
+  const titles = {dashboard:'Dashboard',vendors:'Vendor Management',rfqs:currentRole==='Vendor'?'Open RFQs':'Create RFQ',quotations:currentRole==='Vendor'?'Submit Quotation':'Quotation Submission',comparison:'Quotation Comparison',approvals:'Approval Queue',pos:currentRole==='Vendor'?'My Purchase Orders':'Purchase Orders',invoices:'Invoices',reports:'Reports & Analytics',activity:currentRole==='Admin'?'Audit Log':'Activity & Logs',login:'Sign In'};
+  const ctaMap = ROLE_TOPBAR_CTA[currentRole]||{};
+  const ctaLabel = ctaMap[page];
+  if($('tb-title')) $('tb-title').textContent = titles[page]||page;
+  const ctaEl = $('tb-cta');
+  if(ctaEl){
+    if(!ctaLabel || page==='login'){ctaEl.style.display='none';}
+    else{ctaEl.style.display='flex';ctaEl.innerHTML=`<i class="ti ti-plus"></i> ${ctaLabel}`;}
+  }
+  if($('topbar')) $('topbar').style.display=page==='login'?'none':'flex';
+  if($('sidebar')) $('sidebar').style.display=page==='login'?'none':'flex';
+  const fn = pages[page]||pages.dashboard;
+  $('content').innerHTML = '';
+  if(page==='login'){
+    document.getElementById('app').style.display='flex';
+    $('content').innerHTML='';
+    $('main-panel').style.flex='1';
+  }
+  $('content').innerHTML = fn();
+}
+
+function tbAction(){
+  const actions={dashboard:()=>nav('rfqs'),vendors:()=>showAddVendorModal(),rfqs:()=>{toast('Draft saved successfully');},quotations:()=>submitQuote(),comparison:()=>{nav('approvals');toast('Sent for approval');},approvals:()=>nav('approvals'),pos:()=>{toast('New PO draft created');},invoices:()=>{toast('Invoice template ready');},reports:()=>exportReport(),activity:()=>{toast('Activity refreshed','info');nav('activity');}};
+  const fn=actions[currentPage];if(fn)fn();
+}
+
+function starRating(r){
+  let s='';
+  for(let i=1;i<=5;i++) s+=`<span style="color:${i<=Math.round(r)?'#f59e0b':'#d1d5db'}">★</span>`;
+  return `<span>${s} <span style="color:var(--text3);font-size:11px">${r}</span></span>`;
+}
+function badgeHtml(status){
+  const map={Active:'green',Pending:'amber',Blacklisted:'red',Paid:'green',Overdue:'red',Draft:'gray',Submitted:'blue',Urgent:'red',Normal:'gray'};
+  return `<span class="badge badge-${map[status]||'gray'}">${status}</span>`;
+}
+
+pages.login = ()=>`
+<div style="display:flex;align-items:center;justify-content:center;height:100%;background:linear-gradient(135deg,#f0fdf4 0%,#e0f2fe 100%);min-height:560px">
+  <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:36px;width:360px;box-shadow:0 4px 24px rgba(0,0,0,0.08)">
+    <div style="text-align:center;margin-bottom:24px">
+      <div style="width:48px;height:48px;background:var(--primary);border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:22px;color:#fff"><i class="ti ti-building-store"></i></div>
+      <div style="font-size:20px;font-weight:800;color:var(--text)">VendorBridge</div>
+      <div style="font-size:12px;color:var(--text2);margin-top:4px">Procurement & Vendor Management ERP</div>
+    </div>
+    <div style="display:flex;background:var(--bg);border-radius:8px;padding:3px;margin-bottom:20px" id="login-tabs">
+      <div id="lt-login" style="flex:1;text-align:center;padding:6px;font-size:12px;font-weight:600;background:#fff;border-radius:6px;cursor:pointer;color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,0.1)" onclick="switchLoginTab('login')">Sign In</div>
+      <div id="lt-reg" style="flex:1;text-align:center;padding:6px;font-size:12px;font-weight:600;cursor:pointer;color:var(--text2)" onclick="switchLoginTab('register')">Register</div>
+    </div>
+    <div id="login-panel">
+      <div class="form-group" style="margin-bottom:12px"><label class="form-label">Email address</label><input class="form-input" type="email" value="riya.sharma@acmecorp.com" placeholder="you@company.com"></div>
+      <div class="form-group" style="margin-bottom:12px"><label class="form-label">Password</label><input class="form-input" type="password" value="password123" placeholder="••••••••"></div>
+      <div class="form-group" style="margin-bottom:6px"><label class="form-label">Sign in as</label>
+        <select class="form-input" id="role-select" onchange="changeRole(this.value)">
+          <option value="Procurement Officer">Procurement Officer</option>
+          <option value="Manager / Approver">Manager / Approver</option>
+          <option value="Vendor">Vendor</option>
+          <option value="Admin">Admin</option>
+        </select>
+      </div>
+      <div id="role-desc" style="font-size:11px;color:var(--blue);background:var(--blue-light);padding:6px 10px;border-radius:6px;margin-bottom:14px">Full access: RFQs, Quotations, POs, Invoices</div>
+      <button class="btn btn-primary" style="width:100%;padding:10px;font-size:13px;justify-content:center" onclick="doLogin()">Sign In to VendorBridge</button>
+      <div style="text-align:center;margin-top:14px"><span style="font-size:12px;color:var(--blue);cursor:pointer;text-decoration:underline" onclick="showForgotModal()">Forgot password?</span></div>
+    </div>
+    <div id="register-panel" style="display:none">
+      <div class="form-grid" style="padding:0;margin-bottom:12px">
+        <div class="form-group"><label class="form-label">First name</label><input class="form-input" placeholder="Riya"></div>
+        <div class="form-group"><label class="form-label">Last name</label><input class="form-input" placeholder="Sharma"></div>
+        <div class="form-group"><label class="form-label">Email</label><input class="form-input" placeholder="riya@corp.com"></div>
+        <div class="form-group"><label class="form-label">Phone</label><input class="form-input" placeholder="+91 9876543210"></div>
+        <div class="form-group"><label class="form-label">Role</label><select class="form-input"><option>Procurement Officer</option><option>Admin</option><option>Vendor</option><option>Manager / Approver</option></select></div>
+        <div class="form-group"><label class="form-label">Country</label><input class="form-input" placeholder="India"></div>
+        <div class="form-full form-group"><label class="form-label">Additional info</label><textarea class="form-input" rows="2" placeholder="Company, department, GST..."></textarea></div>
+      </div>
+      <button class="btn btn-primary" style="width:100%;padding:10px;font-size:13px;justify-content:center" onclick="doLogin()">Create Account</button>
+    </div>
+  </div>
+</div>`;
+
+function switchLoginTab(tab){
+  $('login-panel').style.display=tab==='login'?'block':'none';
+  $('register-panel').style.display=tab==='register'?'block':'none';
+  $('lt-login').style.cssText=tab==='login'?'flex:1;text-align:center;padding:6px;font-size:12px;font-weight:600;background:#fff;border-radius:6px;cursor:pointer;color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,0.1)':'flex:1;text-align:center;padding:6px;font-size:12px;font-weight:600;cursor:pointer;color:var(--text2)';
+  $('lt-reg').style.cssText=tab==='register'?'flex:1;text-align:center;padding:6px;font-size:12px;font-weight:600;background:#fff;border-radius:6px;cursor:pointer;color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,0.1)':'flex:1;text-align:center;padding:6px;font-size:12px;font-weight:600;cursor:pointer;color:var(--text2)';
+}
+
+function changeRole(val){
+  currentRole=val;
+  const descs={
+    'Procurement Officer':'Full access: RFQs, Quotations, POs, Invoices',
+    'Manager / Approver':'View & approve procurement requests',
+    'Vendor':'Submit quotations and view your POs',
+    'Admin':'Full admin access: vendors, analytics, settings'
+  };
+  if($('role-desc')) $('role-desc').textContent=descs[val]||'';
+}
+
+function doLogin(){
+  toast(`Welcome back! Signed in as ${currentRole}`,'success');
+  setTimeout(()=>{
+    $('sb-role').textContent=currentRole;
+    const initials={'Procurement Officer':'RS','Manager / Approver':'VP','Vendor':'IS','Admin':'AD'};
+    const names={'Procurement Officer':'Riya Sharma','Manager / Approver':'Vikram Patel','Vendor':'InfraSupplies','Admin':'Sys Admin'};
+    $('sb-avatar').textContent=initials[currentRole]||'RS';
+    $('sb-name').textContent=names[currentRole]||'User';
+    buildSidebar();
+    nav('dashboard');
+  },800);
+}
+
+function showForgotModal(){
+  showModal(`<div class="modal">
+    <div class="modal-head"><span class="modal-title">Reset Password</span><button class="btn btn-ghost btn-icon" onclick="closeModal()"><i class="ti ti-x"></i></button></div>
+    <div class="modal-body">
+      <p style="font-size:12px;color:var(--text2);margin-bottom:14px">Enter your email address and we'll send you a reset link.</p>
+      <div class="form-group"><label class="form-label">Email address</label><input class="form-input" type="email" id="reset-email" placeholder="you@company.com" value="riya.sharma@acmecorp.com"></div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-outline" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="sendReset()">Send reset link</button></div>
+  </div>`);
+}
+function sendReset(){closeModal();toast('Reset link sent to your email','info');}
+
+pages.dashboard = ()=>{
+  if(currentRole==='Vendor') return dashboardVendor();
+  if(currentRole==='Manager / Approver') return dashboardManager();
+  if(currentRole==='Admin') return dashboardAdmin();
+  return dashboardProcurement();
+};
+
+function kpiCard(icon,iconBg,iconColor,accent,label,val,valColor,delta,deltaColor){
+  return `<div class="kpi-card"><div class="kpi-accent" style="background:${accent}"></div><div class="kpi-icon" style="background:${iconBg};color:${iconColor}"><i class="ti ${icon}"></i></div><div class="kpi-label">${label}</div><div class="kpi-val" style="color:${valColor}">${val}</div><div class="kpi-delta" style="color:${deltaColor}">${delta}</div></div>`;
+}
+
+function dashboardProcurement(){
+  return `
+<div class="kpi-grid">
+  ${kpiCard('ti-file-description','var(--primary-light)','var(--primary)','var(--primary)','Active RFQs','12','var(--primary)','↑ 3 this week','var(--primary)')}
+  ${kpiCard('ti-clock','var(--amber-light)','var(--amber)','var(--amber)','Pending Approvals','5','var(--amber)','2 urgent today','var(--red)')}
+  ${kpiCard('ti-currency-rupee','var(--blue-light)','var(--blue)','var(--blue)','Monthly Spend','₹2.3L','var(--blue)','Budget 57% used','var(--text3)')}
+  ${kpiCard('ti-file-invoice','var(--red-light)','var(--red)','var(--red)','Open Invoices','3','var(--red)','₹84,000 outstanding','var(--red)')}
+</div>
+<div class="qa-grid" style="grid-template-columns:repeat(4,1fr)">
+  <div class="qa-btn" onclick="nav('rfqs')"><div class="qa-icon"><i class="ti ti-file-plus"></i></div><div class="qa-text">New RFQ</div></div>
+  <div class="qa-btn" onclick="nav('comparison')"><div class="qa-icon"><i class="ti ti-table"></i></div><div class="qa-text">Compare Quotes</div></div>
+  <div class="qa-btn" onclick="nav('pos')"><div class="qa-icon"><i class="ti ti-package"></i></div><div class="qa-text">Purchase Orders</div></div>
+  <div class="qa-btn" onclick="nav('invoices')"><div class="qa-icon"><i class="ti ti-file-invoice"></i></div><div class="qa-text">Invoices</div></div>
+</div>
+<div class="split-3">
+<div>
+  <div class="card">
+    <div class="card-head"><span class="card-title">Recent Procurement Activity</span><div class="card-actions"><span class="card-sub">Last 7 days</span><button class="btn btn-ghost btn-sm" onclick="nav('activity')">View all →</button></div></div>
+    <table>
+      <thead><tr><th>Event</th><th>User</th><th>Status</th><th>Time</th></tr></thead>
+      <tbody>
+        <tr><td><div style="font-weight:600">RFQ-042 Created</div><div style="font-size:11px;color:var(--text3)">Furniture · 3 vendors</div></td><td>Riya S.</td><td>${badgeHtml('Active')}</td><td style="color:var(--text3)">2h ago</td></tr>
+        <tr><td><div style="font-weight:600">Quote: InfraSupplies</div><div style="font-size:11px;color:var(--text3)">RFQ-042 · ₹3,78,780</div></td><td>Vendor</td><td>${badgeHtml('Submitted')}</td><td style="color:var(--text3)">4h ago</td></tr>
+        <tr><td><div style="font-weight:600">PO-2129 Approved</div><div style="font-size:11px;color:var(--text3)">InfraSupplies</div></td><td>Mgr. Patel</td><td>${badgeHtml('Active')}</td><td style="color:var(--text3)">Yesterday</td></tr>
+        <tr><td><div style="font-weight:600">INV-0081 Sent</div><div style="font-size:11px;color:var(--text3)">TechCorp · ₹1,46,910</div></td><td>Riya S.</td><td>${badgeHtml('Pending')}</td><td style="color:var(--text3)">Yesterday</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="card">
+    <div class="card-head"><span class="card-title">Procurement Funnel</span></div>
+    <div style="padding:14px;display:flex;flex-direction:column;gap:10px">
+      ${[['RFQ → Quotation','9','12','var(--primary)'],['Quotation → Approval','5','9','var(--amber)'],['Approval → PO','4','4','var(--primary)'],['PO → Invoice','3','4','var(--blue)']].map(([l,v,t,c])=>`<div><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;color:var(--text2)">${l}</span><span style="font-size:12px;font-weight:600;color:${c}">${v}/${t}</span></div><div class="prog-bar"><div class="prog-fill" style="width:${Math.round(v/t*100)}%;background:${c}"></div></div></div>`).join('')}
+    </div>
+  </div>
+</div>
+<div>
+  <div class="card">
+    <div class="card-head"><span class="card-title">Monthly Spend</span><div class="card-actions"><span style="font-size:11px;color:var(--primary);font-weight:600">↑ 18% MoM</span><button class="btn btn-ghost btn-sm" onclick="nav('reports')">Report →</button></div></div>
+    <div class="chart-wrap">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:4px"><span style="font-size:10px;color:var(--text3)">₹ Lakhs</span></div>
+      <div class="chart-bars">
+        ${[['Jan',35],['Feb',55],['Mar',42],['Apr',70],['May',60],['Jun',85]].map(([m,h])=>`<div class="bar-col"><div class="bar-val">${(h*0.04).toFixed(1)}L</div><div class="bar-fill ${m==='Jun'?'highlight':''}" style="height:${h}%"></div><div class="bar-label">${m}</div></div>`).join('')}
+      </div>
+      <div style="display:flex;gap:16px;margin-top:12px;padding-top:10px;border-top:1px solid var(--border)">
+        <div><div style="font-size:11px;color:var(--text3)">YTD</div><div style="font-size:15px;font-weight:700;color:var(--primary)">₹12.4L</div></div>
+        <div><div style="font-size:11px;color:var(--text3)">Budget</div><div style="font-size:15px;font-weight:700;color:var(--text)">₹20L</div></div>
+        <div><div style="font-size:11px;color:var(--text3)">Utilised</div><div style="font-size:15px;font-weight:700;color:var(--amber)">62%</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head"><span class="card-title">Action Required</span><span class="nav-badge" style="border-radius:10px;padding:2px 8px">2</span></div>
+    <div style="padding:12px;display:flex;flex-direction:column;gap:8px">
+      <div class="alert alert-red"><i class="ti ti-alert-triangle" style="color:var(--red);font-size:15px;flex-shrink:0;margin-top:1px"></i><div style="flex:1"><div style="font-size:12px;font-weight:600;color:var(--red)">Invoice overdue</div><div style="font-size:11px;color:var(--text2)">INV-0081 · TechCorp · ₹1,46,910</div></div><button class="btn btn-danger btn-xs" onclick="nav('invoices')">View</button></div>
+      <div class="alert alert-amber"><i class="ti ti-clock" style="color:var(--amber);font-size:15px;flex-shrink:0;margin-top:1px"></i><div style="flex:1"><div style="font-size:12px;font-weight:600;color:var(--amber)">Approval pending</div><div style="font-size:11px;color:var(--text2)">RFQ-042 · 18h of 24h SLA elapsed</div></div><button class="btn btn-amber btn-xs" onclick="nav('approvals')">Review</button></div>
+    </div>
+  </div>
+</div>
+</div>`;
+}
+
+function dashboardManager(){
+  return `
+<div class="kpi-grid">
+  ${kpiCard('ti-clock','var(--amber-light)','var(--amber)','var(--amber)','Pending Approvals','2','var(--amber)','1 urgent — SLA 18h elapsed','var(--red)')}
+  ${kpiCard('ti-checks','var(--primary-light)','var(--primary)','var(--primary)','Approved This Month','8','var(--primary)','↑ 2 vs last month','var(--primary)')}
+  ${kpiCard('ti-currency-rupee','var(--blue-light)','var(--blue)','var(--blue)','Approval Value MTD','₹5.8L','var(--blue)','4 POs generated','var(--text3)')}
+  ${kpiCard('ti-x','var(--red-light)','var(--red)','var(--red)','Rejections MTD','1','var(--red)','Budget constraint','var(--text3)')}
+</div>
+<div class="card" style="margin-bottom:16px">
+  <div class="card-head" style="background:var(--amber-light)"><span class="card-title" style="color:var(--amber)">Approval Queue</span><span class="nav-badge" style="border-radius:10px;padding:2px 8px">${approvalPending.filter(x=>x.status==='Pending').length}</span></div>
+  <table id="approval-table-dash">
+    <thead><tr><th>RFQ</th><th>Category</th><th>Recommended Vendor</th><th>Amount</th><th>Priority</th><th>SLA</th><th>Action</th></tr></thead>
+    <tbody>
+      ${approvalPending.map((a,i)=>`<tr>
+        <td><div style="font-weight:600">${a.id}</div></td>
+        <td>${a.cat}</td>
+        <td>${a.vendor}</td>
+        <td style="font-weight:600;color:var(--amber)">${a.amount}</td>
+        <td>${badgeHtml(a.priority)}</td>
+        <td style="font-size:11px;color:${a.priority==='Urgent'?'var(--red)':'var(--text3)'}">${a.priority==='Urgent'?'18h / 24h':'4h / 48h'}</td>
+        <td>
+          ${a.status==='Pending'?`<div style="display:flex;gap:4px"><button class="btn btn-primary btn-xs" onclick="quickApprove(${i});nav('dashboard')"><i class="ti ti-check"></i> Approve</button><button class="btn btn-outline btn-xs" style="color:var(--red)" onclick="quickReject(${i});nav('dashboard')">Reject</button></div>`:`<span style="font-size:11px;color:var(--primary)">✓ ${a.status}</span>`}
+        </td>
+      </tr>`).join('')}
+    </tbody>
+  </table>
+</div>
+<div class="split-3">
+<div>
+  <div class="card">
+    <div class="card-head"><span class="card-title">Approval Timeline</span></div>
+    <div style="padding:14px;display:flex;flex-direction:column;gap:6px">
+      ${[['RFQ-042','InfraSupplies','₹3,78,780','Pending','var(--amber)'],['RFQ-041','OfficeEssentials','₹48,200','Pending','var(--amber)'],['RFQ-040','TechCorp','₹1,24,500','Approved','var(--primary)'],['RFQ-039','FurniMax','₹88,000','Approved','var(--primary)']].map(([id,v,amt,st,c])=>`<div style="display:flex;align-items:center;gap:10px;padding:8px;border:1px solid var(--border);border-radius:var(--radius);background:#fff"><div style="flex:1"><div style="font-size:12px;font-weight:600">${id}</div><div style="font-size:11px;color:var(--text3)">${v} · ${amt}</div></div>${badgeHtml(st)}</div>`).join('')}
+    </div>
+  </div>
+</div>
+<div>
+  <div class="card">
+    <div class="card-head"><span class="card-title">Procurement Funnel</span></div>
+    <div style="padding:14px;display:flex;flex-direction:column;gap:10px">
+      ${[['RFQ → Quotation','9','12','var(--primary)'],['Quotation → Approval','5','9','var(--amber)'],['Approval → PO','4','4','var(--primary)']].map(([l,v,t,c])=>`<div><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;color:var(--text2)">${l}</span><span style="font-size:12px;font-weight:600;color:${c}">${v}/${t}</span></div><div class="prog-bar"><div class="prog-fill" style="width:${Math.round(v/t*100)}%;background:${c}"></div></div></div>`).join('')}
+    </div>
+  </div>
+</div>
+</div>`;
+}
+
+function dashboardVendor(){
+  return `
+<div class="kpi-grid">
+  ${kpiCard('ti-receipt','var(--blue-light)','var(--blue)','var(--blue)','Open RFQs for Me','3','var(--blue)','2 awaiting quote','var(--text3)')}
+  ${kpiCard('ti-send','var(--primary-light)','var(--primary)','var(--primary)','Quotes Submitted','1','var(--primary)','RFQ-042 · submitted','var(--primary)')}
+  ${kpiCard('ti-package','var(--amber-light)','var(--amber)','var(--amber)','Active POs','2','var(--amber)','₹5.0L total value','var(--text3)')}
+  ${kpiCard('ti-checks','var(--primary-light)','var(--primary)','var(--primary)','Deliveries Due','1','var(--primary)','27 Jun 2026','var(--text3)')}
+</div>
+<div class="split-3">
+<div>
+  <div class="card">
+    <div class="card-head"><span class="card-title">Open RFQs — Action Required</span></div>
+    <table>
+      <thead><tr><th>RFQ</th><th>Category</th><th>Deadline</th><th>Status</th><th>Action</th></tr></thead>
+      <tbody>
+        <tr><td><div style="font-weight:600">RFQ-042</div><div style="font-size:11px;color:var(--text3)">Office Furniture Q2</div></td><td>Furniture</td><td>18 Jun 2026</td><td>${badgeHtml('Active')}</td><td><button class="btn btn-primary btn-xs" onclick="nav('quotations')">Submit Quote</button></td></tr>
+        <tr><td><div style="font-weight:600">RFQ-041</div><div style="font-size:11px;color:var(--text3)">Stationery Supplies</div></td><td>Stationery</td><td>10 Jun 2026</td><td>${badgeHtml('Pending')}</td><td><button class="btn btn-outline btn-xs" onclick="nav('quotations')">View RFQ</button></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<div>
+  <div class="card">
+    <div class="card-head"><span class="card-title">My Purchase Orders</span></div>
+    <table>
+      <thead><tr><th>PO Number</th><th>Amount</th><th>Delivery Due</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td style="font-weight:600;color:var(--primary)">PO-2129-2026</td><td>₹3,78,780</td><td style="color:var(--amber)">27 Jun 2026</td><td>${badgeHtml('Active')}</td></tr>
+        <tr><td style="font-weight:600;color:var(--primary)">PO-2127-2026</td><td>₹88,000</td><td>10 May 2026</td><td>${badgeHtml('Paid')}</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>`;
+}
+
+function dashboardAdmin(){
+  return `
+<div class="kpi-grid">
+  ${kpiCard('ti-building-store','var(--blue-light)','var(--blue)','var(--blue)','Total Vendors','28','var(--blue)','3 pending approval','var(--amber)')}
+  ${kpiCard('ti-users','var(--primary-light)','var(--primary)','var(--primary)','Active Users','12','var(--primary)','4 roles in use','var(--text3)')}
+  ${kpiCard('ti-currency-rupee','var(--purple-light)','var(--purple)','var(--purple)','YTD Procurement','₹12.4L','var(--purple)','vs ₹20L budget','var(--text3)')}
+  ${kpiCard('ti-alert-triangle','var(--amber-light)','var(--amber)','var(--amber)','Vendors Pending','3','var(--amber)','Require review','var(--red)')}
+</div>
+<div class="split-3">
+<div>
+  <div class="card">
+    <div class="card-head"><span class="card-title">Vendor Status Overview</span><div class="card-actions"><button class="btn btn-ghost btn-sm" onclick="nav('vendors')">Manage →</button></div></div>
+    <table>
+      <thead><tr><th>Vendor</th><th>Category</th><th>Status</th><th>Action</th></tr></thead>
+      <tbody>
+        ${vendors.map(v=>`<tr><td><div style="font-weight:600">${v.name}</div></td><td>${v.cat}</td><td>${badgeHtml(v.status)}</td><td>${v.status==='Pending'?`<button class="btn btn-primary btn-xs" onclick="approveVendor(${v.id});nav('dashboard')"><i class="ti ti-check"></i> Approve</button>`:''}</td></tr>`).join('')}
+      </tbody>
+    </table>
+  </div>
+</div>
+<div>
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-head"><span class="card-title">Spend by Category</span><div class="card-actions"><button class="btn btn-ghost btn-sm" onclick="nav('reports')">Full report →</button></div></div>
+    <div style="padding:14px;display:flex;flex-direction:column;gap:8px">
+      ${[['IT Hardware',74,4.61,'var(--blue)'],['Furniture',52,3.21,'var(--primary)'],['Stationery',35,2.14,'var(--purple)'],['Logistics',23,1.45,'var(--amber)']].map(([cat,pct,amt,c])=>`<div class="spend-row"><div class="spend-label" style="font-size:12px">${cat}</div><div class="spend-bar-bg"><div class="spend-bar-fill" style="width:${pct}%;background:${c}"></div></div><div class="spend-amount" style="color:${c}">₹${amt}L</div></div>`).join('')}
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head"><span class="card-title">System Alerts</span></div>
+    <div style="padding:10px 12px;display:flex;flex-direction:column;gap:8px">
+      <div class="alert alert-amber" style="margin-bottom:0"><i class="ti ti-clock" style="color:var(--amber);font-size:15px;flex-shrink:0"></i><div style="flex:1"><div style="font-size:12px;font-weight:600;color:var(--amber)">3 vendors pending review</div><div style="font-size:11px;color:var(--text2)">OfficeEssentials, QuickLogix, TechCorp</div></div><button class="btn btn-outline btn-xs" onclick="nav('vendors')">Review</button></div>
+    </div>
+  </div>
+</div>
+</div>`;
+}
+
+pages.vendors = ()=>{
+  const filtered = vendorFilter==='All'?vendors:vendors.filter(v=>v.status===vendorFilter);
+  return `
+<div style="display:flex;gap:10px;margin-bottom:16px;align-items:center;flex-wrap:wrap">
+  <div class="search-wrap" style="max-width:300px"><i class="ti ti-search search-icon"></i><input class="form-input" placeholder="Search by name, GST, category..." oninput="filterVendors(this.value)" id="vendor-search"></div>
+  <div class="chip-row">${['All','Active','Pending','Blacklisted'].map(f=>`<div class="chip ${vendorFilter===f?'active':''}" onclick="setVendorFilter('${f}')">${f}</div>`).join('')}</div>
+  <button class="btn btn-primary" style="margin-left:auto" onclick="showAddVendorModal()"><i class="ti ti-plus"></i> Add Vendor</button>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-title">Vendor Registry</span><span class="card-sub">${filtered.length} vendors</span></div>
+  <table>
+    <thead><tr><th>Vendor</th><th>Category</th><th>GST Number</th><th>Phone</th><th>Rating</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody id="vendor-tbody">
+      ${filtered.map(v=>`<tr>
+        <td><div style="font-weight:600">${v.name}</div><div style="font-size:11px;color:var(--text3)">${v.email}</div></td>
+        <td>${v.cat}</td>
+        <td style="font-size:11px;font-family:monospace">${v.gst}</td>
+        <td>${v.phone}</td>
+        <td>${starRating(v.rating)}</td>
+        <td>${badgeHtml(v.status)}</td>
+        <td><div style="display:flex;gap:6px">
+          <button class="btn btn-outline btn-xs" onclick="showEditVendorModal(${v.id})"><i class="ti ti-edit"></i> Edit</button>
+          ${v.status==='Pending'?`<button class="btn btn-primary btn-xs" onclick="approveVendor(${v.id})"><i class="ti ti-check"></i> Approve</button>`:''}
+          ${v.status==='Blacklisted'?`<button class="btn btn-outline btn-xs" onclick="reinstateVendor(${v.id})">Reinstate</button>`:`<button class="btn btn-ghost btn-xs" onclick="viewVendor(${v.id})"><i class="ti ti-eye"></i> View</button>`}
+        </div></td>
+      </tr>`).join('')}
+    </tbody>
+  </table>
+</div>`;
+};
+
+function setVendorFilter(f){vendorFilter=f;nav('vendors');}
+function filterVendors(q){
+  const rows=$('vendor-tbody').querySelectorAll('tr');
+  rows.forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(q.toLowerCase())?'':'none'});
+}
+function approveVendor(id){
+  const v=vendors.find(x=>x.id===id);if(!v)return;
+  v.status='Active';toast(`${v.name} approved successfully`,'success');nav('vendors');
+}
+function reinstateVendor(id){
+  const v=vendors.find(x=>x.id===id);if(!v)return;
+  v.status='Pending';toast(`${v.name} reinstated — pending review`,'info');nav('vendors');
+}
+function viewVendor(id){
+  const v=vendors.find(x=>x.id===id);if(!v)return;
+  showModal(`<div class="modal">
+    <div class="modal-head"><span class="modal-title">${v.name}</span><button class="btn btn-ghost btn-icon" onclick="closeModal()"><i class="ti ti-x"></i></button></div>
+    <div class="modal-body">
+      <div class="form-grid" style="padding:0">
+        <div class="form-group"><label class="form-label">Category</label><div style="font-size:13px;font-weight:500">${v.cat}</div></div>
+        <div class="form-group"><label class="form-label">Status</label>${badgeHtml(v.status)}</div>
+        <div class="form-group"><label class="form-label">GST Number</label><div style="font-family:monospace;font-size:12px">${v.gst}</div></div>
+        <div class="form-group"><label class="form-label">Phone</label><div>${v.phone}</div></div>
+        <div class="form-group"><label class="form-label">Email</label><div style="color:var(--blue)">${v.email}</div></div>
+        <div class="form-group"><label class="form-label">Rating</label>${starRating(v.rating)}</div>
+      </div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-outline" onclick="closeModal()">Close</button><button class="btn btn-primary" onclick="showEditVendorModal(${id});closeModal()">Edit Vendor</button></div>
+  </div>`);
+}
+function showAddVendorModal(){
+  showModal(`<div class="modal">
+    <div class="modal-head"><span class="modal-title">Add New Vendor</span><button class="btn btn-ghost btn-icon" onclick="closeModal()"><i class="ti ti-x"></i></button></div>
+    <div class="modal-body">
+      <div class="form-grid" style="padding:0">
+        <div class="form-group form-full"><label class="form-label">Vendor name</label><input class="form-input" id="v-name" placeholder="Company name"></div>
+        <div class="form-group form-full"><label class="form-label">Email</label><input class="form-input" id="v-email" placeholder="vendor@company.com"></div>
+        <div class="form-group"><label class="form-label">Category</label><select class="form-input" id="v-cat"><option>IT Hardware</option><option>Furniture</option><option>Stationery</option><option>Logistics</option></select></div>
+        <div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="v-phone" placeholder="+91 9876543210"></div>
+        <div class="form-group form-full"><label class="form-label">GST Number</label><input class="form-input" id="v-gst" placeholder="29AABCX1234Y1Z5"></div>
+      </div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-outline" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="addVendor()"><i class="ti ti-check"></i> Add Vendor</button></div>
+  </div>`);
+}
+function addVendor(){
+  const n=$('v-name').value.trim();
+  if(!n){toast('Vendor name is required','error');return;}
+  vendors.push({id:Date.now(),name:n,email:$('v-email').value||'—',cat:$('v-cat').value,phone:$('v-phone').value||'—',gst:$('v-gst').value||'—',rating:0,status:'Pending'});
+  closeModal();toast(`${n} added — pending approval`,'success');nav('vendors');
+}
+function showEditVendorModal(id){
+  const v=vendors.find(x=>x.id===id);if(!v)return;
+  showModal(`<div class="modal">
+    <div class="modal-head"><span class="modal-title">Edit Vendor — ${v.name}</span><button class="btn btn-ghost btn-icon" onclick="closeModal()"><i class="ti ti-x"></i></button></div>
+    <div class="modal-body">
+      <div class="form-grid" style="padding:0">
+        <div class="form-group form-full"><label class="form-label">Vendor name</label><input class="form-input" id="ev-name" value="${v.name}"></div>
+        <div class="form-group form-full"><label class="form-label">Email</label><input class="form-input" id="ev-email" value="${v.email}"></div>
+        <div class="form-group"><label class="form-label">Category</label><select class="form-input" id="ev-cat">${['IT Hardware','Furniture','Stationery','Logistics'].map(c=>`<option ${c===v.cat?'selected':''}>${c}</option>`).join('')}</select></div>
+        <div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="ev-phone" value="${v.phone}"></div>
+        <div class="form-group form-full"><label class="form-label">GST Number</label><input class="form-input" id="ev-gst" value="${v.gst}"></div>
+        <div class="form-group form-full"><label class="form-label">Status</label><select class="form-input" id="ev-status">${['Active','Pending','Blacklisted'].map(s=>`<option ${s===v.status?'selected':''}>${s}</option>`).join('')}</select></div>
+      </div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-outline" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveVendor(${id})"><i class="ti ti-check"></i> Save Changes</button></div>
+  </div>`);
+}
+function saveVendor(id){
+  const v=vendors.find(x=>x.id===id);if(!v)return;
+  v.name=$('ev-name').value;v.email=$('ev-email').value;v.cat=$('ev-cat').value;v.phone=$('ev-phone').value;v.gst=$('ev-gst').value;v.status=$('ev-status').value;
+  closeModal();toast('Vendor updated successfully','success');nav('vendors');
+}
+
+pages.rfqs = ()=>{
+  const stepHtml=`<div class="stepper">
+    <div class="step-item"><div class="step-circle ${rfqStep>=1?rfqStep===1?'active':'done':''}" onclick="setRfqStep(1)">${rfqStep>1?'✓':'1'}</div><span class="step-label ${rfqStep===1?'active':''}">RFQ Details</span></div>
+    <div class="step-line ${rfqStep>1?'done':''}"></div>
+    <div class="step-item"><div class="step-circle ${rfqStep>=2?rfqStep===2?'active':'done':''}" onclick="setRfqStep(2)">${rfqStep>2?'✓':'2'}</div><span class="step-label ${rfqStep===2?'active':''}">Add Items</span></div>
+    <div class="step-line ${rfqStep>2?'done':''}"></div>
+    <div class="step-item"><div class="step-circle ${rfqStep>=3?'active':''}" onclick="setRfqStep(3)">3</div><span class="step-label ${rfqStep===3?'active':''}">Assign Vendors</span></div>
+  </div>`;
+
+  let body='';
+  if(rfqStep===1) body=`
+    <div class="split">
+    <div>
+    <div class="card">
+      <div class="card-head"><span class="card-title">Step 1 — RFQ Details</span></div>
+      <div class="form-grid">
+        <div class="form-group form-full"><label class="form-label">RFQ title</label><input class="form-input" id="rfq-title" value="Office Furniture Procurement Q2" placeholder="Brief title"></div>
+        <div class="form-group"><label class="form-label">RFQ number</label><input class="form-input" value="RFQ-043" readonly style="background:var(--bg);color:var(--text3)"></div>
+        <div class="form-group"><label class="form-label">Category</label><select class="form-input"><option>Furniture</option><option>IT Hardware</option><option>Stationery</option><option>Logistics</option></select></div>
+        <div class="form-group"><label class="form-label">Priority</label><select class="form-input" id="rfq-priority"><option>Normal</option><option>High</option><option>Urgent</option></select></div>
+        <div class="form-group"><label class="form-label">Submission deadline</label><input class="form-input" type="date" value="2026-06-18"></div>
+        <div class="form-group"><label class="form-label">Delivery expected by</label><input class="form-input" type="date" value="2026-07-10"></div>
+        <div class="form-group form-full"><label class="form-label">Description / Scope</label><textarea class="form-input" rows="3">Supply of ergonomic office chairs and workstations for the new floor expansion. ISO certified products preferred.</textarea></div>
+        <div class="form-group form-full"><label class="form-label">Attachments</label>
+          <div id="attach-zone" style="border:2px dashed var(--border2);border-radius:var(--radius);padding:16px;text-align:center;cursor:pointer;background:var(--bg)" onclick="triggerAttach()" ondragover="event.preventDefault()" ondrop="handleDrop(event)">
+            <i class="ti ti-upload" style="font-size:24px;color:var(--text3);display:block;margin-bottom:6px"></i>
+            <div style="font-size:12px;color:var(--text2)">Drag & drop files or <span style="color:var(--blue);text-decoration:underline">browse to attach</span></div>
+            <div id="attach-list" style="margin-top:8px;font-size:11px;color:var(--primary)">Specs_Q2_Office.pdf — attached</div>
+          </div>
+          <input type="file" id="file-input" style="display:none" onchange="onFileSelect(event)" multiple>
+        </div>
+      </div>
+      <div style="padding:14px 16px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px">
+        <button class="btn btn-outline" onclick="saveDraft()"><i class="ti ti-device-floppy"></i> Save Draft</button>
+        <button class="btn btn-primary" onclick="setRfqStep(2)">Next: Add Items <i class="ti ti-arrow-right"></i></button>
+      </div>
+    </div>
+    </div>
+    <div>${rfqSummaryPanel()}</div>
+    </div>`;
+  else if(rfqStep===2) body=`
+    <div class="split">
+    <div>
+    <div class="card">
+      <div class="card-head"><span class="card-title">Step 2 — Item List</span><div class="card-actions"><button class="btn btn-primary btn-sm" onclick="addRfqItem()"><i class="ti ti-plus"></i> Add Item</button></div></div>
+      <table>
+        <thead><tr><th style="width:30px">#</th><th>Item / Service</th><th style="width:70px">Unit</th><th style="width:60px">Qty</th><th style="width:100px">Est. Price (₹)</th><th>Remarks</th><th style="width:40px"></th></tr></thead>
+        <tbody id="rfq-items">${rfqItemRows()}</tbody>
+      </table>
+      <div style="padding:12px 14px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+        <div style="font-size:12px;color:var(--text2)">Total Est. Value: <strong style="color:var(--primary)">₹${rfqTotal()}</strong></div>
+        <div style="display:flex;gap:8px"><button class="btn btn-outline" onclick="setRfqStep(1)"><i class="ti ti-arrow-left"></i> Back</button><button class="btn btn-primary" onclick="setRfqStep(3)">Next: Assign Vendors <i class="ti ti-arrow-right"></i></button></div>
+      </div>
+    </div>
+    </div>
+    <div>${rfqSummaryPanel()}</div>
+    </div>`;
+  else body=`
+    <div class="split">
+    <div>
+    <div class="card">
+      <div class="card-head"><span class="card-title">Step 3 — Assign Vendors</span><div class="card-actions"><span class="card-sub">Select vendors to receive this RFQ</span></div></div>
+      <div style="padding:16px;display:flex;flex-direction:column;gap:8px" id="vendor-assign-list">
+        ${vendors.filter(v=>v.status==='Active').map(v=>`
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius);background:#fff" id="vendor-row-${v.id}">
+          <input type="checkbox" id="vc-${v.id}" style="width:16px;height:16px;cursor:pointer" ${v.cat==='Furniture'||v.id===1?'checked':''}>
+          <div style="flex:1">
+            <div style="font-weight:600;font-size:12px">${v.name}</div>
+            <div style="font-size:11px;color:var(--text3)">${v.cat} · ${starRating(v.rating)}</div>
+          </div>
+          ${badgeHtml(v.status)}
+        </div>`).join('')}
+      </div>
+      <div style="padding:14px 16px;border-top:1px solid var(--border);display:flex;justify-content:space-between;gap:8px">
+        <button class="btn btn-outline" onclick="setRfqStep(2)"><i class="ti ti-arrow-left"></i> Back</button>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-outline" onclick="saveDraft()"><i class="ti ti-device-floppy"></i> Save Draft</button>
+          <button class="btn btn-primary" onclick="sendRFQ()"><i class="ti ti-send"></i> Send RFQ to Vendors</button>
+        </div>
+      </div>
+    </div>
+    </div>
+    <div>${rfqSummaryPanel()}</div>
+    </div>`;
+  return stepHtml+body;
+};
+
+function rfqSummaryPanel(){
+  return `<div class="card"><div class="card-head"><span class="card-title">RFQ Summary</span></div>
+    <div style="padding:14px;display:flex;flex-direction:column;gap:8px">
+      ${[['RFQ No.','RFQ-043'],['Category','Furniture'],['Items',rfqItems.length+' line items'],['Est. Total','₹'+rfqTotal()],['Deadline','18 Jun 2026'],['Status','Draft']].map(([l,v])=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span style="font-size:11px;color:var(--text3)">${l}</span><span style="font-size:11px;font-weight:600;color:var(--text)">${v}</span></div>`).join('')}
+    </div>
+  </div>
+  <div class="card" style="margin-top:12px"><div class="card-head"><span class="card-title">Open RFQs</span></div>
+    <table><thead><tr><th>RFQ</th><th>Status</th><th>Quotes</th></tr></thead>
+    <tbody>
+      <tr><td>RFQ-042<div style="font-size:11px;color:var(--text3)">Furniture</div></td><td>${badgeHtml('Active')}</td><td>2/3</td></tr>
+      <tr><td>RFQ-041<div style="font-size:11px;color:var(--text3)">Stationery</div></td><td>${badgeHtml('Pending')}</td><td>1/2</td></tr>
+    </tbody></table>
+  </div>`;
+}
+function rfqItemRows(){
+  return rfqItems.map((item,i)=>`<tr id="rfq-row-${item.id}">
+    <td style="color:var(--text3);font-size:11px">${String(i+1).padStart(2,'0')}</td>
+    <td><input class="form-input" value="${item.name}" style="min-width:160px" onchange="rfqItems[${i}].name=this.value"></td>
+    <td><select class="form-input" style="padding:5px 6px"><option>Nos</option><option>Kg</option><option>Ltr</option><option>Set</option></select></td>
+    <td><input class="form-input" type="number" value="${item.qty}" style="width:55px" onchange="rfqItems[${i}].qty=+this.value;updateRfqTotal()"></td>
+    <td><input class="form-input" type="number" value="${item.price}" style="width:90px" onchange="rfqItems[${i}].price=+this.value;updateRfqTotal()"></td>
+    <td><input class="form-input" value="${item.note}" placeholder="Note..."></td>
+    <td><button class="btn btn-ghost btn-icon btn-xs" style="color:var(--red)" onclick="removeRfqItem(${item.id})" title="Remove"><i class="ti ti-x"></i></button></td>
+  </tr>`).join('');
+}
+function rfqTotal(){
+  const t=rfqItems.reduce((s,it)=>s+it.qty*it.price,0);
+  return t.toLocaleString('en-IN');
+}
+function updateRfqTotal(){const el=document.querySelector('[id^="rfq-items"]');if(el)el.innerHTML=rfqItemRows();}
+function addRfqItem(){rfqItems.push({id:Date.now(),name:'New Item',unit:'Nos',qty:1,price:0,note:''});const tb=$('rfq-items');if(tb)tb.innerHTML=rfqItemRows();toast('Item row added','info');}
+function removeRfqItem(id){
+  if(rfqItems.length<=1){toast('At least one item required','error');return;}
+  rfqItems=rfqItems.filter(x=>x.id!==id);
+  const tb=$('rfq-items');if(tb)tb.innerHTML=rfqItemRows();
+  toast('Item removed','info');
+}
+function setRfqStep(s){rfqStep=s;nav('rfqs');}
+function saveDraft(){toast('RFQ draft saved successfully','success');}
+function triggerAttach(){$('file-input').click();}
+function onFileSelect(e){
+  const files=Array.from(e.target.files);
+  if(!files.length)return;
+  const names=files.map(f=>f.name).join(', ');
+  const al=$('attach-list');if(al)al.textContent=names+' — attached';
+  toast(`${files.length} file(s) attached`,'success');
+}
+function handleDrop(e){
+  e.preventDefault();
+  const files=Array.from(e.dataTransfer.files);
+  if(!files.length)return;
+  const al=$('attach-list');if(al)al.textContent=files.map(f=>f.name).join(', ')+' — attached';
+  toast(`${files.length} file(s) attached`,'success');
+}
+function sendRFQ(){toast('RFQ sent to selected vendors successfully','success');setTimeout(()=>nav('quotations'),1200);}
+
+pages.quotations = ()=>`
+<div class="tab-row">
+  <button class="tab-btn active">Submit Quotation</button>
+  <button class="tab-btn" onclick="nav('comparison')">Comparison View →</button>
+</div>
+<div class="card" style="margin-bottom:14px">
+  <div class="card-head" style="background:var(--primary-light)">
+    <div>
+      <div class="card-title" style="color:#15803d">RFQ-042 — Office Furniture Procurement Q2</div>
+      <div class="card-sub" style="color:var(--primary)">Deadline: 18 Jun 2026 · 3 vendors assigned · Est. Budget: ₹4,76,000</div>
+    </div>
+    <div class="card-actions">${badgeHtml('Active')}</div>
+  </div>
+</div>
+<div class="split">
+<div>
+<div class="card">
+  <div class="card-head"><span class="card-title">Quotation Form</span><span class="card-sub">Vendor: InfraSupplies Pvt Ltd</span></div>
+  <table>
+    <thead><tr><th>Item</th><th>Qty</th><th>Unit Price (₹)</th><th>Total</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Ergonomic Chair</td><td>20</td><td><input class="form-input" type="number" id="q-chair" value="${quotePrices.chair}" style="width:80px" onchange="quotePrices.chair=+this.value;updateQuoteTotals()"></td><td id="qt-chair" style="color:var(--primary);font-weight:600">₹${(quotePrices.chair*20).toLocaleString('en-IN')}</td><td><input class="form-input" placeholder="Note..." style="width:90px"></td></tr>
+      <tr><td>Height-Adj. Workstation</td><td>10</td><td><input class="form-input" type="number" id="q-ws" value="${quotePrices.workstation}" style="width:80px" onchange="quotePrices.workstation=+this.value;updateQuoteTotals()"></td><td id="qt-ws" style="color:var(--primary);font-weight:600">₹${(quotePrices.workstation*10).toLocaleString('en-IN')}</td><td><input class="form-input" placeholder="Note..." style="width:90px"></td></tr>
+      <tr><td>Meeting Table (8-seater)</td><td>3</td><td><input class="form-input" type="number" id="q-table" value="${quotePrices.table}" style="width:80px" onchange="quotePrices.table=+this.value;updateQuoteTotals()"></td><td id="qt-table" style="color:var(--primary);font-weight:600">₹${(quotePrices.table*3).toLocaleString('en-IN')}</td><td><input class="form-input" placeholder="Note..." style="width:90px"></td></tr>
+    </tbody>
+  </table>
+  <div class="form-grid" style="border-top:1px solid var(--border);padding-top:14px">
+    <div class="form-group"><label class="form-label">Delivery timeline (days)</label><input class="form-input" value="21" type="number"></div>
+    <div class="form-group"><label class="form-label">Payment terms</label><select class="form-input"><option>Net 30</option><option>Net 45</option><option>50% advance</option></select></div>
+    <div class="form-group form-full"><label class="form-label">Additional comments</label><textarea class="form-input" rows="2">All items are ISO 9001 certified. Free installation included. Warranty: 2 years.</textarea></div>
+  </div>
+  <div style="padding:14px 16px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+    <div style="font-size:13px;color:var(--text2)">Grand Total (incl. 18% GST): <strong style="color:var(--primary);font-size:16px" id="q-grand-total">₹${Math.round((quotePrices.chair*20+quotePrices.workstation*10+quotePrices.table*3)*1.18).toLocaleString('en-IN')}</strong></div>
+    <div style="display:flex;gap:8px"><button class="btn btn-outline" onclick="saveDraft()"><i class="ti ti-device-floppy"></i> Save Draft</button><button class="btn btn-primary" onclick="submitQuote()"><i class="ti ti-send"></i> Submit Quotation</button></div>
+  </div>
+</div>
+</div>
+<div>
+<div class="card" style="margin-bottom:12px">
+  <div class="card-head"><span class="card-title">Quotation Status</span></div>
+  <div style="padding:14px;display:flex;flex-direction:column;gap:8px" id="quote-status-list">
+    ${renderQuoteStatus()}
+  </div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-title">Quote Summary</span></div>
+  <div style="padding:14px;display:flex;flex-direction:column;gap:6px">
+    ${[['Subtotal','₹'+(quotePrices.chair*20+quotePrices.workstation*10+quotePrices.table*3).toLocaleString('en-IN')],['GST (18%)','₹'+Math.round((quotePrices.chair*20+quotePrices.workstation*10+quotePrices.table*3)*0.18).toLocaleString('en-IN')],['Grand Total','₹'+Math.round((quotePrices.chair*20+quotePrices.workstation*10+quotePrices.table*3)*1.18).toLocaleString('en-IN')]].map(([l,v],i)=>`<div style="display:flex;justify-content:space-between;${i===2?'border-top:1px solid var(--border);padding-top:8px;margin-top:4px':''}"><span style="font-size:${i===2?'13px':'12px'};color:var(--text2)">${l}</span><span style="font-size:${i===2?'14px':'12px'};font-weight:${i===2?700:500};color:${i===2?'var(--primary)':'var(--text)'}">${v}</span></div>`).join('')}
+  </div>
+</div>
+</div>
+</div>`;
+
+function renderQuoteStatus(){
+  const statuses={Submitted:{color:'var(--primary)',bg:'var(--primary-light)',icon:'✓'},Draft:{color:'var(--amber)',bg:'var(--amber-light)',icon:'⏳'},'Not started':{color:'var(--text3)',bg:'var(--bg)',icon:'○'}};
+  return Object.entries(quoteStatus).map(([vendor,status])=>{
+    const s=statuses[status]||statuses['Not started'];
+    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:${s.bg};border:1px solid ${status==='Submitted'?'#bbf7d0':status==='Draft'?'#fde68a':'var(--border)'};border-radius:var(--radius)">
+      <span style="color:${s.color};font-size:16px">${s.icon}</span>
+      <div style="flex:1"><div style="font-size:12px;font-weight:600;color:${s.color}">${vendor}</div><div style="font-size:11px;color:var(--text3)">${status==='Submitted'?'Submitted 4 Jun':status==='Draft'?'Draft in progress':'Awaiting submission'}</div></div>
+      ${status!=='Submitted'?`<button class="btn btn-primary btn-xs" onclick="markQuoteSubmitted('${vendor}')">Submit</button>`:''}
+    </div>`;
+  }).join('');
+}
+function markQuoteSubmitted(vendor){
+  quoteStatus[vendor]='Submitted';
+  const el=$('quote-status-list');if(el)el.innerHTML=renderQuoteStatus();
+  toast(`${vendor} quotation marked as submitted`,'success');
+}
+function updateQuoteTotals(){
+  const c=quotePrices.chair,w=quotePrices.workstation,t=quotePrices.table;
+  const el1=$('qt-chair'),el2=$('qt-ws'),el3=$('qt-table'),elG=$('q-grand-total');
+  if(el1)el1.textContent='₹'+(c*20).toLocaleString('en-IN');
+  if(el2)el2.textContent='₹'+(w*10).toLocaleString('en-IN');
+  if(el3)el3.textContent='₹'+(t*3).toLocaleString('en-IN');
+  if(elG)elG.textContent='₹'+Math.round((c*20+w*10+t*3)*1.18).toLocaleString('en-IN');
+}
+function submitQuote(){quoteStatus.InfraSupplies='Submitted';toast('Quotation submitted successfully','success');setTimeout(()=>nav('comparison'),1000);}
+
+pages.comparison = ()=>`
+<div class="alert alert-green" style="margin-bottom:16px">
+  <i class="ti ti-sparkles" style="color:var(--primary);font-size:18px"></i>
+  <div><strong style="color:#15803d">Comparison ready:</strong> <span style="color:#15803d;font-size:12px">RFQ-042 — 3 quotations received. Best quote highlighted.</span></div>
+  <button class="btn btn-primary btn-sm" style="margin-left:auto" onclick="nav('approvals');toast('Forwarded for approval','success')"><i class="ti ti-arrow-right"></i> Send for Approval</button>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-title">Side-by-Side Comparison</span><span class="card-sub">Green = best / lowest value per row</span><div class="card-actions"><button class="btn btn-outline btn-sm" onclick="exportReport()"><i class="ti ti-download"></i> Export</button></div></div>
+  <div class="comp-wrap">
+    <table class="comp-table">
+      <thead>
+        <tr>
+          <th style="min-width:140px">Criteria</th>
+          <th style="min-width:120px">FurniMax Solutions</th>
+          <th class="comp-header-winner" style="min-width:130px">InfraSupplies Ltd ⭐ Best</th>
+          <th style="min-width:120px">OfficeEssentials</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Ergonomic Chair ×20</td><td>₹1,50,000</td><td class="comp-winner">₹1,44,000</td><td>₹1,56,000</td></tr>
+        <tr><td>Workstation ×10</td><td>₹1,18,000</td><td class="comp-winner">₹1,15,000</td><td>₹1,22,000</td></tr>
+        <tr><td>Meeting Table ×3</td><td class="comp-winner">₹60,000</td><td>₹62,000</td><td>₹65,000</td></tr>
+        <tr style="background:#fafbfc"><td><strong>Subtotal (ex. GST)</strong></td><td><strong>₹3,28,000</strong></td><td class="comp-winner"><strong>₹3,21,000</strong></td><td><strong>₹3,43,000</strong></td></tr>
+        <tr><td>GST 18%</td><td>₹59,040</td><td class="comp-winner">₹57,780</td><td>₹61,740</td></tr>
+        <tr style="background:#fafbfc"><td><strong>Grand Total</strong></td><td>₹3,87,040</td><td class="comp-winner" style="font-size:14px"><strong>₹3,78,780</strong></td><td>₹4,04,740</td></tr>
+        <tr><td>Delivery (days)</td><td>25</td><td class="comp-winner">21</td><td>30</td></tr>
+        <tr><td>Vendor Rating</td><td>4.3 ★</td><td class="comp-winner">4.8 ★</td><td>3.2 ★</td></tr>
+        <tr><td>Payment Terms</td><td>Net 30</td><td>Net 30</td><td class="comp-winner">Net 45</td></tr>
+        <tr><td>Warranty</td><td>1 year</td><td class="comp-winner">2 years</td><td>1 year</td></tr>
+        <tr><td>ISO Certified</td><td>Yes</td><td class="comp-winner">Yes</td><td>No</td></tr>
+        <tr>
+          <td><strong>Action</strong></td>
+          <td><button class="btn btn-outline btn-sm" onclick="shortlistVendor('FurniMax')" id="sl-furnimax">${vendorShortlist.FurniMax==='shortlisted'?'✓ Shortlisted':'Shortlist'}</button></td>
+          <td><button class="btn btn-primary btn-sm" onclick="selectVendor('InfraSupplies')"><i class="ti ti-check"></i> Select & Approve</button></td>
+          <td><button class="btn btn-outline btn-sm" style="color:var(--red);border-color:#fecaca" onclick="rejectVendor('OfficeEssentials')">${vendorShortlist.OfficeEssentials==='rejected'?'✗ Rejected':'Reject'}</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div style="padding:12px 16px;background:var(--primary-light);border-top:1px solid #bbf7d0;font-size:12px;color:#15803d">
+    <strong>Recommendation:</strong> InfraSupplies Pvt Ltd saves ₹8,260 vs next best. Fastest delivery (21 days) + highest rating (4.8★) + 2-year warranty. Recommended for approval.
+  </div>
+</div>`;
+
+function shortlistVendor(name){
+  vendorShortlist[name]='shortlisted';
+  toast(`${name} shortlisted`,'success');
+  const btn=$('sl-furnimax');if(btn){btn.textContent='✓ Shortlisted';btn.className='btn btn-primary btn-sm';}
+}
+function selectVendor(name){toast(`${name} selected — forwarding for approval`,'success');setTimeout(()=>nav('approvals'),900);}
+function rejectVendor(name){
+  vendorShortlist[name]='rejected';
+  toast(`${name} rejected`,'info');
+  nav('comparison');
+}
+
+pages.approvals = ()=>`
+<div class="split">
+<div>
+<div class="card" style="margin-bottom:14px">
+  <div class="card-head" style="background:var(--amber-light)"><span class="card-title" style="color:var(--amber)">Approval Workflow — RFQ-042</span><span class="card-sub">InfraSupplies Pvt Ltd · ₹3,78,780</span>${badgeHtml('Pending')}</div>
+  <div style="padding:16px">
+    <div class="tl-wrap" style="padding:0">
+      ${[
+        {icon:'✓',color:'green',title:'RFQ Created',meta:'Riya Sharma · Procurement Officer · 03 Jun 2026',body:'RFQ-042 issued for Office Furniture Procurement Q2. 3 vendors assigned.',line:true},
+        {icon:'✓',color:'green',title:'Quotations Received',meta:'System · 05 Jun 2026, 17:40',body:'3/3 vendors submitted. Comparison report generated. InfraSupplies recommended.',line:true},
+        {icon:'✓',color:'green',title:'Best Quote Selected',meta:'Riya Sharma · 06 Jun 2026, 09:00',body:'InfraSupplies Pvt Ltd selected · ₹3,78,780 · Forwarded for L1 approval.',line:true},
+        {icon:'⏳',color:'amber',title:'L1 Manager Approval — Pending',meta:'Mgr. Vikram Patel · Awaiting action · SLA: 24h',body:'Assigned on 06 Jun 2026. Please review quotation summary and approve or reject.',line:true},
+        {icon:'○',color:'gray',title:'Purchase Order Generation',meta:'Awaiting approval to proceed',body:'',line:false}
+      ].map(t=>`<div class="tl-item">
+        <div style="display:flex;flex-direction:column;align-items:center">
+          <div class="tl-dot ${t.color}">${t.icon}</div>
+          ${t.line?'<div class="tl-vline"></div>':''}
+        </div>
+        <div class="tl-right" style="padding-bottom:${t.line?'16':'0'}px">
+          <div class="tl-title">${t.title}</div>
+          <div class="tl-meta">${t.meta}</div>
+          ${t.body?`<div class="tl-body">${t.body}</div>`:''}
+        </div>
+      </div>`).join('')}
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-head"><span class="card-title">Pending Approvals</span><span class="nav-badge" style="border-radius:10px;padding:2px 8px" id="pending-count">${approvalPending.filter(x=>x.status==='Pending').length}</span></div>
+  <table id="approval-table">
+    <thead><tr><th>RFQ</th><th>Vendor</th><th>Amount</th><th>Priority</th><th>Status</th><th>Action</th></tr></thead>
+    <tbody>${renderApprovalRows()}</tbody>
+  </table>
+</div>
+</div>
+
+<div>
+<div class="card" style="margin-bottom:12px">
+  <div class="card-head"><span class="card-title">Quotation Summary</span></div>
+  <div style="padding:14px;display:flex;flex-direction:column;gap:6px">
+    ${[['Vendor','InfraSupplies Pvt Ltd'],['RFQ','RFQ-042'],['Category','Furniture'],['Delivery','21 days'],['Rating','4.8 ★'],['Payment','Net 30'],['Warranty','2 years'],['ISO','Certified']].map(([l,v])=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span style="font-size:11px;color:var(--text3)">${l}</span><span style="font-size:11px;font-weight:600">${v}</span></div>`).join('')}
+    <div style="display:flex;justify-content:space-between;padding:6px 0;margin-top:4px;border-top:2px solid var(--border)"><span style="font-size:12px;color:var(--text2)">Total</span><span style="font-size:16px;font-weight:700;color:var(--primary)">₹3,78,780</span></div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-title">Approval Action</span></div>
+  <div style="padding:14px;display:flex;flex-direction:column;gap:12px">
+    <div><div class="form-label" style="margin-bottom:6px">Approval level</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div style="flex:1;text-align:center;padding:6px;background:var(--primary-light);border:1px solid var(--primary);border-radius:var(--radius);font-size:11px;color:#15803d;font-weight:600">L1 · Mgr. Patel</div>
+        <i class="ti ti-arrow-right" style="color:var(--text3)"></i>
+        <div style="flex:1;text-align:center;padding:6px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);font-size:11px;color:var(--text3)">L2 · Director</div>
+      </div>
+    </div>
+    <div class="form-group"><label class="form-label">Approver remarks</label><textarea class="form-input" id="approval-remarks" rows="3" placeholder="Add conditions or comments...">Approved. All ISO requirements met. Proceed with PO generation.</textarea></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-danger" style="flex:1;justify-content:center" onclick="doApprovalAction('reject')"><i class="ti ti-x"></i> Reject</button>
+      <button class="btn btn-primary" style="flex:2;justify-content:center" onclick="doApprovalAction('approve')"><i class="ti ti-check"></i> Approve & Generate PO</button>
+    </div>
+  </div>
+</div>
+</div>
+</div>`;
+
+function renderApprovalRows(){
+  return approvalPending.map((a,i)=>`<tr id="apr-row-${i}">
+    <td><div style="font-weight:600">${a.id}</div><div style="font-size:11px;color:var(--text3)">${a.cat}</div></td>
+    <td>${a.vendor}</td>
+    <td style="font-weight:600;color:var(--amber)">${a.amount}</td>
+    <td>${badgeHtml(a.priority)}</td>
+    <td>${badgeHtml(a.status)}</td>
+    <td><div style="display:flex;gap:4px">
+      ${a.status==='Pending'?`<button class="btn btn-primary btn-xs" onclick="quickApprove(${i})"><i class="ti ti-check"></i> Approve</button><button class="btn btn-outline btn-xs" style="color:var(--red)" onclick="quickReject(${i})">Reject</button>`:`<span style="font-size:11px;color:var(--primary)">✓ ${a.status}</span>`}
+    </div></td>
+  </tr>`).join('');
+}
+function quickApprove(i){
+  approvalPending[i].status='Approved';
+  toast(`${approvalPending[i].id} approved successfully`,'success');
+  const tb=document.querySelector('#approval-table tbody');if(tb)tb.innerHTML=renderApprovalRows();
+  const pc=$('pending-count');if(pc)pc.textContent=approvalPending.filter(x=>x.status==='Pending').length;
+}
+function quickReject(i){
+  approvalPending[i].status='Rejected';
+  toast(`${approvalPending[i].id} rejected`,'info');
+  const tb=document.querySelector('#approval-table tbody');if(tb)tb.innerHTML=renderApprovalRows();
+  const pc=$('pending-count');if(pc)pc.textContent=approvalPending.filter(x=>x.status==='Pending').length;
+}
+function doApprovalAction(type){
+  const remarks=$('approval-remarks');
+  if(type==='approve'){
+    toast('RFQ-042 approved — PO-2129 generated automatically','success');
+    approvalPending[0].status='Approved';
+    setTimeout(()=>nav('pos'),1200);
+  } else {
+    const r=remarks?remarks.value.trim():'';
+    if(!r){toast('Please add rejection remarks','error');return;}
+    toast('RFQ-042 rejected — vendor notified','info');
+    approvalPending[0].status='Rejected';
+  }
+}
+
+pages.pos = ()=>`
+<div class="tab-row">
+  <button class="tab-btn active">Purchase Orders</button>
+  <button class="tab-btn" onclick="nav('invoices')">Invoices →</button>
+</div>
+<div class="split">
+<div>
+<div class="card" style="margin-bottom:14px">
+  <div class="card-head">
+    <div><div class="card-title">PO-2129-2026 — Auto-generated after approval</div><div class="card-sub">InfraSupplies Pvt Ltd · RFQ-042 · Furniture</div></div>
+    <div class="card-actions">
+      ${badgeHtml('Active')}
+      <button class="btn btn-outline btn-sm" onclick="downloadPDF()"><i class="ti ti-download"></i> PDF</button>
+      <button class="btn btn-outline btn-sm" onclick="printPO()"><i class="ti ti-printer"></i> Print</button>
+      <button class="btn btn-primary btn-sm" onclick="nav('invoices');toast('Invoice INV-0083 created','success')"><i class="ti ti-file-invoice"></i> Invoice</button>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:16px;border-bottom:1px solid var(--border)">
+    <div><div class="form-label" style="margin-bottom:6px">Bill To</div><div style="font-weight:700;font-size:13px">Acme Corp India Pvt Ltd</div><div style="font-size:11px;color:var(--text3)">GST: 29AABCA1234J1Z5<br>123 Business Park, Whitefield, Bengaluru 560066</div></div>
+    <div><div class="form-label" style="margin-bottom:6px">Vendor</div><div style="font-weight:700;font-size:13px">InfraSupplies Pvt Ltd</div><div style="font-size:11px;color:var(--text3)">GST: 29AABCI1234J1Z5<br>456 Industrial Area, Peenya, Bengaluru 560058</div></div>
+    <div><div class="form-label">PO Number</div><div style="font-weight:700;color:var(--primary);font-size:14px">PO-2129-2026</div></div>
+    <div><div class="form-label">PO Date / Due</div><div style="font-weight:600;font-size:13px">21 May 2026</div><div style="font-size:11px;color:var(--amber)">Delivery due: 31 Jul 2026</div></div>
+  </div>
+  <table>
+    <thead><tr><th>#</th><th>Item</th><th>Qty</th><th>Unit Price</th><th>Total</th></tr></thead>
+    <tbody>
+      <tr><td style="color:var(--text3)">1</td><td>Ergonomic Chair (High-Back)</td><td>20</td><td>₹7,200</td><td style="font-weight:600">₹1,44,000</td></tr>
+      <tr><td style="color:var(--text3)">2</td><td>Height-Adj. Workstation</td><td>10</td><td>₹11,500</td><td style="font-weight:600">₹1,15,000</td></tr>
+      <tr><td style="color:var(--text3)">3</td><td>Meeting Table (8-seater)</td><td>3</td><td>₹20,667</td><td style="font-weight:600">₹62,000</td></tr>
+    </tbody>
+  </table>
+  <div style="padding:14px 16px;display:flex;justify-content:flex-end;border-top:1px solid var(--border)">
+    <div style="width:220px;display:flex;flex-direction:column;gap:5px">
+      <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--text2)">Subtotal</span><span>₹3,21,000</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--text2)">CGST (9%)</span><span>₹28,890</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--text2)">SGST (9%)</span><span>₹28,890</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:700;color:var(--primary);border-top:1px solid var(--border);padding-top:6px;margin-top:2px"><span>Total</span><span>₹3,78,780</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-head"><span class="card-title">All Purchase Orders</span></div>
+  <table>
+    <thead><tr><th>PO Number</th><th>Vendor</th><th>Amount</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>
+      <tr><td style="color:var(--primary);font-weight:600">PO-2129-2026</td><td>InfraSupplies</td><td>₹3,78,780</td><td>21 May 2026</td><td>${badgeHtml('Active')}</td><td><div style="display:flex;gap:4px"><button class="btn btn-outline btn-xs" onclick="downloadPDF()"><i class="ti ti-download"></i></button><button class="btn btn-ghost btn-xs" onclick="printPO()"><i class="ti ti-printer"></i></button></div></td></tr>
+      <tr><td style="color:var(--primary);font-weight:600">PO-2128-2026</td><td>TechCorp Ltd</td><td>₹1,24,500</td><td>15 May 2026</td><td>${badgeHtml('Active')}</td><td><div style="display:flex;gap:4px"><button class="btn btn-outline btn-xs" onclick="downloadPDF()"><i class="ti ti-download"></i></button><button class="btn btn-ghost btn-xs" onclick="printPO()"><i class="ti ti-printer"></i></button></div></td></tr>
+      <tr><td style="color:var(--primary);font-weight:600">PO-2127-2026</td><td>FurniMax</td><td>₹88,000</td><td>10 May 2026</td><td>${badgeHtml('Pending')}</td><td><div style="display:flex;gap:4px"><button class="btn btn-outline btn-xs" onclick="downloadPDF()"><i class="ti ti-download"></i></button></div></td></tr>
+    </tbody>
+  </table>
+</div>
+</div>
+
+<div>
+<div class="card" style="margin-bottom:12px">
+  <div class="card-head"><span class="card-title">PO Workflow</span></div>
+  <div style="padding:14px">
+    ${[['✓','green','RFQ Approved','Mgr. Patel · 06 Jun 2026'],['✓','green','PO-2129 Generated','System · Auto · 06 Jun 2026'],['⏳','amber','Awaiting Delivery','Expected: 27 Jun 2026'],['○','gray','Invoice & Payment','Pending delivery']].map(([i,c,t,m])=>`<div class="wf-step">
+      <div class="wf-circle" style="background:${c==='green'?'var(--primary-light)':c==='amber'?'var(--amber-light)':'var(--bg)'};border:2px solid ${c==='green'?'var(--primary)':c==='amber'?'var(--amber)':'var(--border2)'};color:${c==='green'?'var(--primary)':c==='amber'?'var(--amber)':'var(--text3)'}">${i}</div>
+      <div><div style="font-size:12px;font-weight:600;color:var(--text)">${t}</div><div style="font-size:11px;color:var(--text3)">${m}</div></div>
+    </div>`).join('')}
+    <div style="margin-top:12px">
+      <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="nav('invoices');toast('Invoice created from PO-2129','success')"><i class="ti ti-file-invoice"></i> Generate Invoice</button>
+    </div>
+  </div>
+</div>
+</div>
+</div>`;
+
+function downloadPDF(){toast('PDF download started — check your downloads folder','success');}
+function printPO(){toast('Sent to printer — PO-2129-2026','success');window.print&&window.print();}
+
+pages.invoices = ()=>`
+<div style="display:flex;gap:8px;align-items:center;margin-bottom:16px">
+  <div class="chip-row">
+    <div class="chip active">All Invoices</div>
+    <div class="chip" onclick="toast('Filtered: Pending','info')">Pending</div>
+    <div class="chip" onclick="toast('Filtered: Overdue','info')">Overdue</div>
+    <div class="chip" onclick="toast('Filtered: Paid','info')">Paid</div>
+  </div>
+  <button class="btn btn-primary" style="margin-left:auto" onclick="toast('New invoice created — INV-0083','success')"><i class="ti ti-plus"></i> New Invoice</button>
+</div>
+
+<div class="card" style="margin-bottom:16px">
+  <div class="card-head">
+    <div><div class="card-title">INV-0082 — Purchase Invoice</div><div class="card-sub">PO Ref: PO-2129-2026 · InfraSupplies Pvt Ltd</div></div>
+    <div class="card-actions">
+      ${badgeHtml('Pending')}
+      <button class="btn btn-outline btn-sm" onclick="printInvoice()"><i class="ti ti-printer"></i> Print</button>
+      <button class="btn btn-outline btn-sm" onclick="downloadPDF()"><i class="ti ti-download"></i> PDF</button>
+      <button class="btn btn-primary btn-sm" onclick="emailInvoice('infra@supplies.com')"><i class="ti ti-mail"></i> Email</button>
+    </div>
+  </div>
+  <div class="inv-wrap" style="border:none;border-radius:0;padding:20px">
+    <div class="inv-header">
+      <div>
+        <div style="font-size:20px;font-weight:800;color:#15803d">VendorBridge</div>
+        <div style="font-size:12px;color:#555;margin-top:2px">Acme Corp India Pvt Ltd</div>
+        <div style="font-size:11px;color:#777">123 Business Park, Whitefield, Bengaluru 560066</div>
+        <div style="font-size:11px;color:#777">GST: 29AABCA1234J1Z5 · +91 80 4567 8900</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:26px;font-weight:800;color:#111;letter-spacing:-1px">INVOICE</div>
+        <div style="font-size:13px;font-weight:700;color:#15803d">INV-0082</div>
+        <div style="font-size:11px;color:#777">Invoice Date: 06 Jun 2026</div>
+        <div style="font-size:11px;color:#777">Due Date: 06 Jul 2026</div>
+        <div style="margin-top:6px;background:#fef9c3;color:#854d0e;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:700;display:inline-block;border:1px solid #fde68a">PAYMENT PENDING</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px;padding:12px;background:#fafbfc;border-radius:var(--radius)">
+      <div><div style="font-size:10px;font-weight:700;color:#888;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px">Bill To</div><div style="font-size:13px;font-weight:700">InfraSupplies Pvt Ltd</div><div style="font-size:11px;color:#666">456 Industrial Area, Peenya<br>Bengaluru, KA 560058<br>GST: 29AABCI1234J1Z5</div></div>
+      <div><div style="font-size:10px;font-weight:700;color:#888;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px">Reference</div><div style="font-size:13px;font-weight:700">PO-2129-2026</div><div style="font-size:11px;color:#666">RFQ-042 · Furniture<br>Approved: Mgr. Vikram Patel<br>06 Jun 2026</div></div>
+    </div>
+    <table style="border-collapse:collapse;width:100%;margin:12px 0">
+      <thead><tr style="background:#f5f5f5">${['#','Description','Qty','Unit Price','GST','Amount'].map(h=>`<th style="border:1px solid #e5e7eb;padding:8px 10px;font-size:11px;text-align:left;font-weight:600">${h}</th>`).join('')}</tr></thead>
+      <tbody>
+        ${[['1','Ergonomic Chair (High-Back)','20','₹7,200','18%','₹1,70,208'],['2','Height-Adj. Workstation','10','₹11,500','18%','₹1,35,700'],['3','Meeting Table (8-seater)','3','₹20,667','18%','₹73,163']].map(r=>`<tr>${r.map(c=>`<td style="border:1px solid #e5e7eb;padding:8px 10px;font-size:12px">${c}</td>`).join('')}</tr>`).join('')}
+        <tr style="background:#f0fdf4"><td colspan="5" style="border:1px solid #e5e7eb;padding:8px 10px;font-weight:700;text-align:right;font-size:12px">Grand Total</td><td style="border:1px solid #e5e7eb;padding:8px 10px;font-size:15px;font-weight:800;color:#15803d">₹3,79,071</td></tr>
+      </tbody>
+    </table>
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:12px;padding-top:10px;border-top:1px solid #e5e7eb">
+      <div><div style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">Payment Details</div><div style="font-size:11px;color:#444">HDFC Bank · A/C: 001234567890 · IFSC: HDFC0001234</div><div style="font-size:11px;color:#444">UPI: acmecorp@hdfcbank</div></div>
+      <div style="text-align:right"><div style="font-size:10px;color:#888">Amount in words:</div><div style="font-size:11px;font-weight:700;color:#111;max-width:220px">Three Lakh Seventy Nine Thousand Seventy One Rupees only</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-head"><span class="card-title">All Invoices</span></div>
+  <table>
+    <thead><tr><th>Invoice</th><th>PO Ref</th><th>Vendor</th><th>Amount</th><th>Due Date</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>
+      ${invoices.map(inv=>`<tr>
+        <td style="font-weight:600;color:var(--primary)">${inv.id}</td>
+        <td>${inv.po}</td><td>${inv.vendor}</td><td style="font-weight:600">${inv.amount}</td><td style="color:${inv.status==='Overdue'?'var(--red)':'var(--text2)'}">${inv.due}</td>
+        <td>${badgeHtml(inv.status)}</td>
+        <td><div style="display:flex;gap:4px">
+          ${inv.status==='Overdue'?`<button class="btn btn-amber btn-xs" onclick="sendReminder('${inv.vendor}')"><i class="ti ti-mail"></i> Remind</button>`:''}
+          ${inv.status==='Pending'?`<button class="btn btn-primary btn-xs" onclick="emailInvoice('${inv.vendor}')"><i class="ti ti-mail"></i> Email</button>`:''}
+          <button class="btn btn-ghost btn-xs" onclick="viewInvoice('${inv.id}')"><i class="ti ti-eye"></i> View</button>
+          <button class="btn btn-ghost btn-xs" onclick="downloadPDF()"><i class="ti ti-download"></i></button>
+        </div></td>
+      </tr>`).join('')}
+    </tbody>
+  </table>
+</div>`;
+
+function emailInvoice(vendor){toast(`Invoice emailed to ${vendor} successfully`,'success');}
+function sendReminder(vendor){toast(`Payment reminder sent to ${vendor}`,'info');}
+function viewInvoice(id){showModal(`<div class="modal"><div class="modal-head"><span class="modal-title">Invoice ${id}</span><button class="btn btn-ghost btn-icon" onclick="closeModal()"><i class="ti ti-x"></i></button></div><div class="modal-body"><p style="color:var(--text2);font-size:13px">Viewing ${id} — full invoice detail is shown in the main panel above.</p><div style="margin-top:12px;display:flex;gap:8px"><button class="btn btn-primary btn-sm" onclick="emailInvoice('vendor');closeModal()"><i class="ti ti-mail"></i> Email</button><button class="btn btn-outline btn-sm" onclick="downloadPDF();closeModal()"><i class="ti ti-download"></i> Download PDF</button><button class="btn btn-ghost btn-sm" onclick="printInvoice();closeModal()"><i class="ti ti-printer"></i> Print</button></div></div><div class="modal-foot"><button class="btn btn-outline" onclick="closeModal()">Close</button></div></div>`);}
+function printInvoice(){toast('Invoice sent to printer','success');window.print&&window.print();}
+
+pages.reports = ()=>`
+<div style="display:flex;gap:10px;align-items:center;margin-bottom:20px">
+  <div><div style="font-size:14px;font-weight:700;color:var(--text)">Reports & Analytics</div><div style="font-size:12px;color:var(--text3)">Procurement Insights · Jun 2026</div></div>
+  <div style="margin-left:auto;display:flex;gap:8px">
+    <div class="chip-row">${['May 2026','Jun 2026','Q2 2026','YTD'].map((m,i)=>`<div class="chip ${i===1?'active':''}" onclick="toast('Date range: ${m}','info')">${m}</div>`).join('')}</div>
+    <button class="btn btn-primary" onclick="exportReport()"><i class="ti ti-download"></i> Export Report</button>
+  </div>
+</div>
+<div class="kpi-grid">
+  <div class="kpi-card"><div class="kpi-accent" style="background:var(--primary)"></div><div class="kpi-icon" style="background:var(--primary-light);color:var(--primary)"><i class="ti ti-currency-rupee"></i></div><div class="kpi-label">Total Spend</div><div class="kpi-val">₹12.4L</div><div class="kpi-delta" style="color:var(--primary)">YTD 2026</div></div>
+  <div class="kpi-card"><div class="kpi-accent" style="background:var(--blue)"></div><div class="kpi-icon" style="background:var(--blue-light);color:var(--blue)"><i class="ti ti-building-store"></i></div><div class="kpi-label">Active Vendors</div><div class="kpi-val">28</div><div class="kpi-delta" style="color:var(--primary)">+4 this quarter</div></div>
+  <div class="kpi-card"><div class="kpi-accent" style="background:var(--amber)"></div><div class="kpi-icon" style="background:var(--amber-light);color:var(--amber)"><i class="ti ti-truck-delivery"></i></div><div class="kpi-label">On-time Delivery</div><div class="kpi-val">94%</div><div class="kpi-delta" style="color:var(--primary)">↑ 3% vs last month</div></div>
+  <div class="kpi-card"><div class="kpi-accent" style="background:var(--purple)"></div><div class="kpi-icon" style="background:var(--purple-light);color:var(--purple)"><i class="ti ti-package"></i></div><div class="kpi-label">Monthly POs</div><div class="kpi-val">3</div><div class="kpi-delta" style="color:var(--text3)">₹5.1L value</div></div>
+</div>
+<div class="split-3">
+<div>
+  <div class="card">
+    <div class="card-head"><span class="card-title">Spend by Category</span></div>
+    <div style="padding:16px">
+      ${[['IT Hardware',74,4.61,'var(--blue)'],['Furniture',52,3.21,'var(--primary)'],['Stationery',35,2.14,'var(--purple)'],['Logistics',23,1.45,'var(--amber)'],['Misc',16,0.99,'var(--text3)']].map(([cat,pct,amt,c])=>`
+      <div class="spend-row">
+        <div class="spend-label">${cat}</div>
+        <div class="spend-bar-bg"><div class="spend-bar-fill" style="width:${pct}%;background:${c}"></div></div>
+        <div class="spend-amount" style="color:${c}">₹${amt}L</div>
+      </div>`).join('')}
+    </div>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <div class="card-head"><span class="card-title">Procurement Overview</span></div>
+    <table>
+      <thead><tr><th>Metric</th><th>Value</th><th>vs Last Month</th></tr></thead>
+      <tbody>
+        <tr><td>RFQs Issued</td><td style="font-weight:600">12</td><td style="color:var(--primary)">↑ 3</td></tr>
+        <tr><td>Avg. Quote Time</td><td style="font-weight:600">4.2 days</td><td style="color:var(--primary)">↓ 0.8d</td></tr>
+        <tr><td>PO Cycle Time</td><td style="font-weight:600">6.5 days</td><td style="color:var(--amber)">→ same</td></tr>
+        <tr><td>Savings vs Budget</td><td style="font-weight:600;color:var(--primary)">₹1.6L</td><td style="color:var(--primary)">↑ 8%</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<div>
+  <div class="card">
+    <div class="card-head"><span class="card-title">Monthly Trend</span></div>
+    <div class="chart-wrap">
+      <div class="chart-bars" style="height:110px">
+        ${[['Jan',40,1.6],['Feb',60,2.4],['Mar',45,1.8],['Apr',75,3.0],['May',65,2.6],['Jun',85,3.4]].map(([m,h,v])=>`<div class="bar-col"><div class="bar-val">₹${v}L</div><div class="bar-fill ${m==='Jun'?'highlight':''}" style="height:${h}%"></div><div class="bar-label">${m}</div></div>`).join('')}
+      </div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <div class="card-head"><span class="card-title">Top Vendors by Spend</span></div>
+    <table>
+      <thead><tr><th>Vendor</th><th>Spend</th><th>POs</th><th>Rating</th></tr></thead>
+      <tbody>
+        <tr><td style="font-weight:600">TechCorp Ltd</td><td style="color:var(--primary)">₹4,20,000</td><td>4</td><td style="color:var(--amber)">4.8★</td></tr>
+        <tr><td style="font-weight:600">InfraSupplies</td><td style="color:var(--primary)">₹3,20,000</td><td>3</td><td style="color:var(--amber)">4.1★</td></tr>
+        <tr><td style="font-weight:600">FurniMax</td><td style="color:var(--primary)">₹1,30,000</td><td>2</td><td style="color:var(--amber)">4.3★</td></tr>
+        <tr><td style="font-weight:600">OfficeEssentials</td><td style="color:var(--primary)">₹80,000</td><td>1</td><td style="color:var(--amber)">3.2★</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>`;
+
+function exportReport(){
+  toast('Generating report — download will start shortly','success');
+  setTimeout(()=>toast('Report exported as VendorBridge_Jun2026.xlsx','info'),1500);
+}
+
+pages.activity = ()=>`
+<div style="display:flex;gap:10px;align-items:center;margin-bottom:16px">
+  <div><div style="font-size:14px;font-weight:700;color:var(--text)">Activity & Logs</div><div style="font-size:12px;color:var(--text3)">Full procurement audit trail</div></div>
+  <div style="margin-left:auto">
+    <div class="chip-row" id="activity-chips">
+      ${['All','RFQs','Approvals','Invoiced','Vendors'].map(f=>`<div class="chip ${activityFilter===f?'active':''}" onclick="setActivityFilter('${f}')">${f}</div>`).join('')}
+    </div>
+  </div>
+</div>
+<div class="split-3">
+<div>
+<div class="card">
+  <div class="card-head"><span class="card-title">Audit Timeline</span><div class="card-actions"><button class="btn btn-ghost btn-sm" onclick="toast('Timeline exported','success')"><i class="ti ti-download"></i> Export</button></div></div>
+  <div class="tl-wrap" id="activity-timeline">
+    ${renderActivityTimeline()}
+  </div>
+</div>
+</div>
+<div>
+  <div class="card" style="margin-bottom:12px">
+    <div class="card-head"><span class="card-title">System Alerts</span><span class="nav-badge" style="border-radius:10px;padding:2px 8px">3</span></div>
+    <div style="padding:12px;display:flex;flex-direction:column;gap:8px">
+      <div class="alert alert-red"><i class="ti ti-alert-circle" style="color:var(--red);font-size:16px;flex-shrink:0;margin-top:2px"></i><div style="flex:1"><div style="font-size:12px;font-weight:700;color:var(--red)">Invoice Overdue</div><div style="font-size:11px;color:var(--text2)">INV-0081 · TechCorp · ₹1,46,910 unpaid</div></div><button class="btn btn-danger btn-xs" style="flex-shrink:0" onclick="sendReminder('TechCorp Ltd')">Remind</button></div>
+      <div class="alert alert-amber"><i class="ti ti-clock" style="color:var(--amber);font-size:16px;flex-shrink:0;margin-top:2px"></i><div style="flex:1"><div style="font-size:12px;font-weight:700;color:var(--amber)">RFQ Deadline Soon</div><div style="font-size:11px;color:var(--text2)">RFQ-041 · Stationery · 10 Jun 2026</div></div><button class="btn btn-outline btn-xs" style="flex-shrink:0" onclick="nav('rfqs')">View</button></div>
+      <div class="alert alert-amber"><i class="ti ti-alert-triangle" style="color:var(--amber);font-size:16px;flex-shrink:0;margin-top:2px"></i><div style="flex:1"><div style="font-size:12px;font-weight:700;color:var(--amber)">Approval SLA Warning</div><div style="font-size:11px;color:var(--text2)">RFQ-041 · 18h of 24h elapsed</div></div><button class="btn btn-amber btn-xs" style="flex-shrink:0" onclick="nav('approvals')">Review</button></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head"><span class="card-title">Recent Actions</span></div>
+    <table><thead><tr><th>Action</th><th>By</th><th>Time</th></tr></thead>
+    <tbody>
+      <tr><td>INV-0082 emailed</td><td>Riya S.</td><td style="color:var(--text3)">10 min</td></tr>
+      <tr><td>PO-2129 generated</td><td>System</td><td style="color:var(--text3)">1h ago</td></tr>
+      <tr><td>RFQ-042 approved</td><td>Mgr. Patel</td><td style="color:var(--text3)">2h ago</td></tr>
+      <tr><td>Quote: InfraSupplies</td><td>Vendor</td><td style="color:var(--text3)">5h ago</td></tr>
+      <tr><td>Vendor TechCorp added</td><td>Admin</td><td style="color:var(--text3)">2d ago</td></tr>
+    </tbody></table>
+  </div>
+</div>
+</div>`;
+
+const allActivities = [
+  {type:'RFQs',dot:'green',icon:'✓',title:'RFQ-042 Created',meta:'Riya Sharma · Procurement Officer · 03 Jun 2026, 09:15',body:'RFQ-042 issued for Office Furniture Procurement Q2. 3 vendors: FurniMax, InfraSupplies, OfficeEssentials. Deadline: 18 Jun 2026.'},
+  {type:'RFQs',dot:'green',icon:'✓',title:'RFQ-041 Issued',meta:'Riya Sharma · 02 Jun 2026, 14:00',body:'RFQ-041 for Stationery supplies issued to 2 vendors. Deadline: 10 Jun 2026.'},
+  {type:'Approvals',dot:'amber',icon:'⏳',title:'Approval Pending — RFQ-042',meta:'Mgr. Vikram Patel · Awaiting review · SLA: 24h',body:'Forwarded by Riya Sharma on 06 Jun. Best quote: InfraSupplies ₹3,78,780.'},
+  {type:'Approvals',dot:'green',icon:'✓',title:'PO-2128 Approved',meta:'Mgr. Patel · 15 May 2026, 11:20',body:'TechCorp Ltd PO approved and generated. ₹1,24,500.'},
+  {type:'Invoiced',dot:'amber',icon:'🧾',title:'INV-0082 Generated & Emailed',meta:'Riya Sharma · 06 Jun 2026, 10:00',body:'Invoice for ₹3,79,071 emailed to infra@supplies.com. Due: 06 Jul 2026.'},
+  {type:'Invoiced',dot:'green',icon:'✓',title:'INV-0080 Marked Paid',meta:'Finance · 12 May 2026',body:'FurniMax invoice ₹1,03,840 confirmed paid via NEFT.'},
+  {type:'Vendors',dot:'blue',icon:'ℹ',title:'TechCorp Ltd Added',meta:'Admin · 01 Jun 2026',body:'New vendor registered: IT Hardware category. Pending approval.'},
+  {type:'Vendors',dot:'green',icon:'✓',title:'OfficeEssentials Approved',meta:'Admin · 20 May 2026',body:'Vendor profile approved after document verification.'},
+];
+function renderActivityTimeline(){
+  const filtered = activityFilter==='All' ? allActivities : allActivities.filter(a=>a.type===activityFilter);
+  if(!filtered.length) return '<div style="padding:16px;text-align:center;color:var(--text3)">No activities found for this filter.</div>';
+  return filtered.map((a,i)=>`<div class="tl-item">
+    <div style="display:flex;flex-direction:column;align-items:center">
+      <div class="tl-dot ${a.dot}">${a.icon}</div>
+      ${i<filtered.length-1?'<div class="tl-vline"></div>':''}
+    </div>
+    <div class="tl-right" style="padding-bottom:${i<filtered.length-1?'14':'0'}px">
+      <div class="tl-title">${a.title}</div>
+      <div class="tl-meta">${a.meta}</div>
+      <div class="tl-body">${a.body}</div>
+    </div>
+  </div>`).join('');
+}
+function setActivityFilter(f){
+  activityFilter=f;
+  const tl=$('activity-timeline');
+  const chips=$('activity-chips');
+  if(tl) tl.innerHTML=renderActivityTimeline();
+  if(chips) chips.innerHTML=['All','RFQs','Approvals','Invoiced','Vendors'].map(x=>`<div class="chip ${f===x?'active':''}" onclick="setActivityFilter('${x}')">${x}</div>`).join('');
+}
+
+document.querySelectorAll('.nav-item').forEach(el=>{
+  el.addEventListener('click',()=>nav(el.dataset.page));
+});
+
+nav('dashboard');
+</script>
