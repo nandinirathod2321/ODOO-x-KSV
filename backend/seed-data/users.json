@@ -1,0 +1,6 @@
+[
+  { "email": "admin@vendorbridge.com", "password": "admin123", "name": "Admin User", "role": "ADMIN" },
+  { "email": "officer@vendorbridge.com", "password": "officer123", "name": "Procurement Officer", "role": "PROCUREMENT_OFFICER" },
+  { "email": "vendor@vendorbridge.com", "password": "vendor123", "name": "Test Vendor", "role": "VENDOR" },
+  { "email": "manager@vendorbridge.com", "password": "manager123", "name": "Manager User", "role": "MANAGER" }
+]

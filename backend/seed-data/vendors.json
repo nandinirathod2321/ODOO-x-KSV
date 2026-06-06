@@ -1,0 +1,10 @@
+[
+  { "name": "Tech Corp India", "email": "contact@techcorp.in", "phone": "9876543210", "gstNumber": "27AADCB2230M1Z2", "category": "IT Hardware", "status": "ACTIVE", "address": "Mumbai, MH" },
+  { "name": "SoftDev Solutions", "email": "sales@softdev.in", "phone": "9876543211", "gstNumber": "27AADCB2230M1Z3", "category": "IT Software", "status": "ACTIVE", "address": "Pune, MH" },
+  { "name": "Office Plus", "email": "orders@officeplus.in", "phone": "9876543212", "gstNumber": "27AADCB2230M1Z4", "category": "Office Supplies", "status": "ACTIVE", "address": "Delhi" },
+  { "name": "Speedy Logistics", "email": "info@speedylogistics.in", "phone": "9876543213", "gstNumber": "27AADCB2230M1Z5", "category": "Logistics", "status": "ACTIVE", "address": "Chennai, TN" },
+  { "name": "CleanSpace Facility", "email": "admin@cleanspace.in", "phone": "9876543214", "gstNumber": "27AADCB2230M1Z6", "category": "Facility Management", "status": "ACTIVE", "address": "Bangalore, KA" },
+  { "name": "BrandBoost Marketing", "email": "hello@brandboost.in", "phone": "9876543215", "gstNumber": "27AADCB2230M1Z7", "category": "Marketing", "status": "ACTIVE", "address": "Hyderabad, TS" },
+  { "name": "Legal Eagle Associates", "email": "consult@legaleagle.in", "phone": "9876543216", "gstNumber": "27AADCB2230M1Z8", "category": "Legal Services", "status": "ACTIVE", "address": "Kolkata, WB" },
+  { "name": "Stratagem Consulting", "email": "advisor@stratagem.in", "phone": "9876543217", "gstNumber": "27AADCB2230M1Z9", "category": "Consulting", "status": "ACTIVE", "address": "Gurugram, HR" }
+]
