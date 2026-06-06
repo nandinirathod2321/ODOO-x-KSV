@@ -1,31 +1,30 @@
-import PDFDocument from 'pdfkit';
+import puppeteer from 'puppeteer';
+import { buildInvoiceHTML, buildPurchaseOrderHTML } from '../utils/invoiceHtmlTemplate.js';
 
 export class PDFService {
-  async generateInvoicePdf(invoice: any): Promise<Buffer> {
-    return new Promise((resolve, reject) => {
-      try {
-        const doc = new PDFDocument({ margin: 50 });
-        const buffers: Buffer[] = [];
-
-        doc.on('data', buffers.push.bind(buffers));
-        doc.on('end', () => resolve(Buffer.concat(buffers)));
-
-        // Basic Invoice PDF
-        doc.fontSize(20).text('INVOICE', { align: 'center' });
-        doc.moveDown();
-        
-        doc.fontSize(12).text(`Invoice #: ${invoice.invoice_number}`);
-        doc.text(`Date: ${new Date(invoice.created_at).toLocaleDateString()}`);
-        doc.moveDown();
-
-        doc.text(`Subtotal: $${invoice.subtotal}`);
-        doc.text(`Tax: $${invoice.tax_amount}`);
-        doc.fontSize(14).text(`Grand Total: $${invoice.grand_total}`, { underline: true });
-
-        doc.end();
-      } catch (err) {
-        reject(err);
-      }
+  static async generatePDF(htmlContent: string): Promise<Buffer> {
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
+    const page = await browser.newPage();
+    await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+    const pdfBuffer = await page.pdf({
+      format: 'A4',
+      printBackground: true,
+      margin: { top: '20px', bottom: '20px', left: '20px', right: '20px' }
+    });
+    await browser.close();
+    return Buffer.from(pdfBuffer);
+  }
+
+  static async generateInvoicePDF(invoiceData: any, companyData: any): Promise<Buffer> {
+    const html = buildInvoiceHTML(invoiceData, companyData);
+    return this.generatePDF(html);
+  }
+
+  static async generatePurchaseOrderPDF(poData: any, companyData: any): Promise<Buffer> {
+    const html = buildPurchaseOrderHTML(poData, companyData);
+    return this.generatePDF(html);
   }
 }

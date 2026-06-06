@@ -1,29 +1,53 @@
 import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import http from 'http';
-import { initializeWebSocket } from './websocket/index.js';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
 import authRoutes from './routes/auth.routes.js';
+import rfqRoutes from './routes/rfq.routes.js';
+import activityLogRoutes from './routes/activityLog.routes.js';
+import notificationRoutes from './routes/notification.routes.js';
+import reportsRoutes from './routes/reports.routes.js';
+import invoiceRoutes from './routes/invoice.routes.js';
 import quotationRoutes from './routes/quotation.routes.js';
-import { errorHandler } from './middleware/errorHandler.js';
+import vendorRoutes from './routes/vendor.routes.js';
+import lookupRoutes from './routes/lookup.routes.js';
+import myRoutes from './routes/my.routes.js';
 
-dotenv.config();
+import { globalErrorHandler } from './middlewares/error.middleware';
 
 const app = express();
-const server = http.createServer(app);
+const httpServer = createServer(app);
+const io = new Server(httpServer, { cors: { origin: '*' } });
 
-app.use(cors());
 app.use(express.json());
+app.set('io', io);
 
-// Initialize WebSockets
-initializeWebSocket(server);
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
 
 app.use('/api/auth', authRoutes);
+app.use('/api/vendors', vendorRoutes);
+app.use('/api/lookups', lookupRoutes);
+app.use('/api/my', myRoutes);
+app.use('/api/rfqs', rfqRoutes);
 app.use('/api/quotations', quotationRoutes);
+app.use('/api/invoices', invoiceRoutes);
+app.use('/api/activity-logs', activityLogRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/reports', reportsRoutes);
 
-app.use(errorHandler);
+
+
+
+
+app.use(globalErrorHandler);
 
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => {
+httpServer.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+app.use((req, res) => {
+  res.status(404).json({ message: "Route not found" });
+});
+app.use(errorMiddleware);

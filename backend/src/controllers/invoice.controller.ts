@@ -1,142 +1,68 @@
-import prisma from '../lib/prisma.js';
-import { generateInvoicePdf } from '../lib/pdf.js';
-import { sendInvoiceEmail } from '../lib/mailer.js';
+import { Request, Response, NextFunction } from 'express';
+import { InvoiceService } from '../services/invoice.service.js';
+import { generateInvoiceSchema, markPaidSchema, sendInvoiceEmailSchema } from '../validators/invoice.validator.js';
 
-export const getAll = async (req, res, next) => {
-  try {
-    const invoices = await prisma.invoice.findMany({
-      include: { vendor: { select: { name: true } } }
-    });
-    res.json(invoices);
-  } catch (err) {
-    next(err);
+export class InvoiceController {
+  static async getAll(req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await InvoiceService.getAll(req.query);
+      res.json(result);
+    } catch (e) { next(e); }
   }
-};
 
-export const getOne = async (req, res, next) => {
-  try {
-    const invoice = await prisma.invoice.findUnique({
-      where: { id: req.params.id },
-      include: {
-        vendor: true,
-        po: {
-          include: {
-            approval: {
-              include: {
-                quotation: {
-                  include: { rfq: true }
-                }
-              }
-            }
-          }
-        }
+  static async getById(req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await InvoiceService.getById(req.params.id);
+      
+      // Enforce Vendor access
+      if (req.user!.role === 'VENDOR' && result.invoice.vendor.userId !== req.user!.id) {
+        return res.status(403).json({ message: 'Forbidden' });
       }
-    });
-    if (!invoice) return res.status(404).json({ error: 'Invoice not found' });
-    res.json(invoice);
-  } catch (err) {
-    next(err);
+
+      res.json({ data: result });
+    } catch (e) { next(e); }
   }
-};
 
-export const generate = async (req, res, next) => {
-  try {
-    const { poId } = req.body;
-    
-    const result = await prisma.$transaction(async (tx) => {
-      const po = await tx.purchaseOrder.findUnique({ where: { id: poId } });
-      if (!po) throw new Error('PO not found');
-
-      const count = await tx.invoice.count();
-      const invoiceNumber = `INV-${new Date().getFullYear()}-${(count + 1).toString().padStart(4, '0')}`;
-
-      const invoice = await tx.invoice.create({
-        data: {
-          invoiceNumber,
-          poId: po.id,
-          vendorId: po.vendorId,
-          subtotal: po.subtotal,
-          taxAmount: po.taxAmount,
-          total: po.total,
-          status: 'DRAFT'
-        }
-      });
-
-      await tx.purchaseOrder.update({
-        where: { id: po.id },
-        data: { status: 'INVOICED' }
-      });
-
-      return invoice;
-    });
-
-    res.status(201).json(result);
-  } catch (err) {
-    next(err);
+  static async generate(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = generateInvoiceSchema.parse(req.body);
+      const io = req.app.get('io');
+      const result = await InvoiceService.generate(data.purchaseOrderId, req.user!.id, io);
+      res.status(201).json({ message: 'Invoice generated', data: result });
+    } catch (e) { next(e); }
   }
-};
 
-export const getPdf = async (req, res, next) => {
-  try {
-    const invoice = await prisma.invoice.findUnique({
-      where: { id: req.params.id },
-      include: {
-        vendor: true,
-        po: {
-          include: {
-            approval: {
-              include: {
-                quotation: {
-                  include: { rfq: true }
-                }
-              }
-            }
-          }
-        }
+  static async markPaid(req: Request, res: Response, next: NextFunction) {
+    try {
+      markPaidSchema.parse(req.body);
+      const io = req.app.get('io');
+      const result = await InvoiceService.markPaid(req.params.id, req.user!.id, io);
+      res.json({ message: 'Invoice marked paid', data: result });
+    } catch (e) { next(e); }
+  }
+
+  static async getPdf(req: Request, res: Response, next: NextFunction) {
+    try {
+      const invoiceData = await InvoiceService.getById(req.params.id);
+      
+      if (req.user!.role === 'VENDOR' && invoiceData.invoice.vendor.userId !== req.user!.id) {
+        return res.status(403).json({ message: 'Forbidden' });
       }
-    });
-    if (!invoice) return res.status(404).json({ error: 'Invoice not found' });
 
-    const pdfBuffer = await generateInvoicePdf(invoice);
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `inline; filename=${invoice.invoiceNumber}.pdf`);
-    res.send(pdfBuffer);
-  } catch (err) {
-    next(err);
+      const buffer = await InvoiceService.getPdfBuffer(req.params.id);
+      
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename=Invoice-${invoiceData.invoice.invoiceNumber}.pdf`);
+      res.send(buffer);
+    } catch (e) { next(e); }
   }
-};
 
-export const sendEmail = async (req, res, next) => {
-  try {
-    const invoice = await prisma.invoice.findUnique({
-      where: { id: req.params.id },
-      include: {
-        vendor: true,
-        po: {
-          include: {
-            approval: {
-              include: {
-                quotation: {
-                  include: { rfq: true }
-                }
-              }
-            }
-          }
-        }
-      }
-    });
-    if (!invoice) return res.status(404).json({ error: 'Invoice not found' });
-
-    const pdfBuffer = await generateInvoicePdf(invoice);
-    await sendInvoiceEmail(invoice.vendor.email, invoice.vendor.name, pdfBuffer, invoice.invoiceNumber);
-
-    const updatedInvoice = await prisma.invoice.update({
-      where: { id: invoice.id },
-      data: { status: 'SENT', emailedAt: new Date() }
-    });
-
-    res.json({ message: 'Email sent successfully', invoice: updatedInvoice });
-  } catch (err) {
-    next(err);
+  static async sendEmail(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = sendInvoiceEmailSchema.parse(req.body);
+      const io = req.app.get('io');
+      await InvoiceService.sendEmail(req.params.id, data, req.user!.id, io);
+      res.json({ message: 'Invoice sent successfully' });
+    } catch (e) { next(e); }
   }
-};
+}

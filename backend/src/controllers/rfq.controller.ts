@@ -1,100 +1,57 @@
-import prisma from '../lib/prisma.js';
+import { Request, Response, NextFunction } from 'express';
+import { RFQService } from '../services/rfq.service.js';
+import { createRFQSchema, updateRFQSchema } from '../validators/rfq.validator.js';
 
-export const getAll = async (req, res, next) => {
-  try {
-    let where = {};
-    if (req.user.role === 'VENDOR') {
-      const vendorUser = await prisma.vendor.findFirst({ where: { email: req.user.email } });
-      if (!vendorUser) return res.json([]);
-      where = { vendors: { some: { vendorId: vendorUser.id } } };
-    }
-    const rfqs = await prisma.rfq.findMany({ where });
-    res.json(rfqs);
-  } catch (err) {
-    next(err);
+export class RFQController {
+  static async getAll(req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await RFQService.getAll(req.query, req.user!.role, req.user!.id);
+      res.json(result);
+    } catch (e) { next(e); }
   }
-};
 
-export const getOne = async (req, res, next) => {
-  try {
-    const rfq = await prisma.rfq.findUnique({
-      where: { id: req.params.id },
-      include: {
-        vendors: { include: { vendor: true } },
-        _count: { select: { quotations: true } }
-      }
-    });
-    if (!rfq) return res.status(404).json({ error: 'RFQ not found' });
-    res.json(rfq);
-  } catch (err) {
-    next(err);
+  static async getById(req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await RFQService.getById(req.params.id);
+      res.json({ data: result });
+    } catch (e) { next(e); }
   }
-};
 
-export const create = async (req, res, next) => {
-  try {
-    const { title, description, quantity, unit, deadline, vendorIds } = req.body;
-    
-    const result = await prisma.$transaction(async (tx) => {
-      const count = await tx.rfq.count();
-      const rfqNumber = `RFQ-${new Date().getFullYear()}-${(count + 1).toString().padStart(4, '0')}`;
-      
-      const rfq = await tx.rfq.create({
-        data: {
-          rfqNumber,
-          title,
-          description,
-          quantity,
-          unit,
-          deadline: new Date(deadline),
-          status: 'OPEN',
-          createdById: req.user.id
-        }
-      });
-
-      if (vendorIds && vendorIds.length > 0) {
-        await tx.rfqVendor.createMany({
-          data: vendorIds.map(id => ({ rfqId: rfq.id, vendorId: id }))
-        });
-      }
-
-      await tx.activityLog.create({
-        data: {
-          userId: req.user.id,
-          action: 'CREATED_RFQ',
-          entityType: 'Rfq',
-          entityId: rfq.id
-        }
-      });
-
-      return rfq;
-    });
-
-    res.status(201).json(result);
-  } catch (err) {
-    next(err);
+  static async create(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = createRFQSchema.parse(req.body);
+      const result = await RFQService.create(data, req.user!.id);
+      res.status(201).json({ message: 'RFQ created', data: result });
+    } catch (e) { next(e); }
   }
-};
 
-export const updateStatus = async (req, res, next) => {
-  try {
-    const { status } = req.body;
-    const rfq = await prisma.rfq.update({
-      where: { id: req.params.id },
-      data: { status }
-    });
-    
-    await prisma.activityLog.create({
-      data: {
-        userId: req.user.id,
-        action: `UPDATED_RFQ_STATUS_${status}`,
-        entityType: 'Rfq',
-        entityId: rfq.id
-      }
-    });
-
-    res.json(rfq);
-  } catch (err) {
-    next(err);
+  static async update(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = updateRFQSchema.parse(req.body);
+      const result = await RFQService.update(req.params.id, data, req.user!.id);
+      res.json({ message: 'RFQ updated', data: result });
+    } catch (e) { next(e); }
   }
-};
+
+  static async publish(req: Request, res: Response, next: NextFunction) {
+    try {
+      const io = req.app.get('io');
+      const result = await RFQService.publish(req.params.id, req.user!.id, io);
+      res.json({ message: 'RFQ published', data: result });
+    } catch (e) { next(e); }
+  }
+
+  static async close(req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await RFQService.close(req.params.id, req.user!.id);
+      res.json({ message: 'RFQ closed', data: result });
+    } catch (e) { next(e); }
+  }
+
+  static async delete(req: Request, res: Response, next: NextFunction) {
+    try {
+      await RFQService.delete(req.params.id);
+      res.json({ message: 'RFQ deleted' });
+    } catch (e) { next(e); }
+  }
+}

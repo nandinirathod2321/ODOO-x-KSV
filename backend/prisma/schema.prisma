@@ -7,184 +7,260 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  ADMIN
-  PROCUREMENT_OFFICER
-  VENDOR
-  MANAGER
-}
-
-enum VendorStatus {
-  ACTIVE
-  INACTIVE
-  BLACKLISTED
-}
-
-enum RfqStatus {
-  DRAFT
-  SENT
-  QUOTATION_RECEIVED
-  CLOSED
-}
-
-enum QuotationStatus {
-  SUBMITTED
-  SELECTED
-  REJECTED
-}
-
-enum ApprovalStatus {
-  PENDING
-  APPROVED
-  REJECTED
-}
-
-enum PoStatus {
-  ISSUED
-  INVOICED
-  CLOSED
-}
-
-enum InvoiceStatus {
-  DRAFT
-  SENT
-  PAID
-}
-
 model User {
-  id            String   @id @default(uuid())
-  name          String
-  email         String   @unique
-  password_hash String
-  role          Role
-  status        String   @default("ACTIVE")
-  created_at    DateTime @default(now())
-  updated_at    DateTime @updatedAt
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      String // ADMIN, MANAGER, PROCUREMENT_OFFICER, VENDOR
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  rfqs          Rfq[]
-  approvals     Approval[]
-  activity_logs ActivityLog[]
-  notifications Notification[]
+  Vendor            Vendor?
+  ActivityLogs      ActivityLog[]
+  Notifications     Notification[]
+  PasswordResetOTPs PasswordResetOTP[]
+}
+
+model VendorCategory {
+  id      String   @id @default(uuid())
+  name    String   @unique
+  Vendors Vendor[]
 }
 
 model Vendor {
-  id              String       @id @default(uuid())
-  vendor_name     String
-  vendor_category String?
-  gst_number      String?
-  email           String       @unique
-  phone           String?
-  address         String?
-  rating          Float        @default(0.0)
-  status          VendorStatus @default(ACTIVE)
-  created_at      DateTime     @default(now())
-  updated_at      DateTime     @updatedAt
+  id                       String    @id @default(uuid())
+  userId                   String    @unique
+  categoryId               String?
+  name                     String
+  email                    String
+  phone                    String?
+  gstNumber                String?
+  address                  String?
+  contactPerson            String?
+  status                   String    @default("ACTIVE") // ACTIVE, INACTIVE, BLOCKED
+  rating                   Float     @default(0)
+  portalEnabled            Boolean   @default(false)
+  lastLoginAt              DateTime?
+  averageResponseTimeHours Float     @default(0)
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime  @updatedAt
 
-  rfq_vendors     RfqVendor[]
-  quotations      Quotation[]
-  pos             PurchaseOrder[]
+  user           User            @relation(fields: [userId], references: [id])
+  category       VendorCategory? @relation(fields: [categoryId], references: [id])
+  rfqs           RFQVendor[]
+  quotations     Quotation[]
+  purchaseOrders PurchaseOrder[]
+  invoices       Invoice[]
 }
 
-model Rfq {
+model RFQ {
   id          String   @id @default(uuid())
+  rfqNumber   String   @unique
   title       String
+  description String?
+  deadline    DateTime
+  status      String   @default("DRAFT") // DRAFT, PUBLISHED, QUOTATION_RECEIVED, AWARDED, CLOSED, CANCELLED
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  items                        RFQItem[]
+  vendors                      RFQVendor[]
+  quotations                   Quotation[]
+  purchaseOrders               PurchaseOrder[]
+  quotationComparisonSnapshots QuotationComparisonSnapshot[]
+}
+
+model RFQItem {
+  id          String  @id @default(uuid())
+  rfqId       String
   description String
   quantity    Int
-  deadline    DateTime
-  status      RfqStatus @default(DRAFT)
-  created_by  String
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  unit        String
+  notes       String?
 
-  user        User     @relation(fields: [created_by], references: [id])
-  rfq_vendors RfqVendor[]
-  quotations  Quotation[]
+  rfq            RFQ             @relation(fields: [rfqId], references: [id], onDelete: Cascade)
+  quotationItems QuotationItem[]
 }
 
-model RfqVendor {
-  id        String @id @default(uuid())
-  rfq_id    String
-  vendor_id String
+model RFQVendor {
+  id        String   @id @default(uuid())
+  rfqId     String
+  vendorId  String
+  invitedAt DateTime @default(now())
 
-  rfq    Rfq    @relation(fields: [rfq_id], references: [id])
-  vendor Vendor @relation(fields: [vendor_id], references: [id])
+  rfq    RFQ    @relation(fields: [rfqId], references: [id], onDelete: Cascade)
+  vendor Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
 
-  @@unique([rfq_id, vendor_id])
+  @@unique([rfqId, vendorId])
 }
 
 model Quotation {
-  id            String   @id @default(uuid())
-  rfq_id        String
-  vendor_id     String
-  price         Decimal
-  delivery_days Int
-  remarks       String?
-  status        QuotationStatus @default(SUBMITTED)
-  submitted_at  DateTime @default(now())
+  id              String   @id @default(uuid())
+  quotationNumber String   @unique
+  rfqId           String
+  vendorId        String
+  deliveryDays    Int
+  validityDate    DateTime
+  paymentTerms    String?
+  notes           String?
+  totalAmount     Float
+  status          String   @default("SUBMITTED") // SUBMITTED, UNDER_REVIEW, ACCEPTED, REJECTED
+  isWinner        Boolean  @default(false)
+  submittedAt     DateTime @default(now())
 
-  rfq       Rfq             @relation(fields: [rfq_id], references: [id])
-  vendor    Vendor          @relation(fields: [vendor_id], references: [id])
-  approvals Approval[]
-  pos       PurchaseOrder[]
+  rfq            RFQ             @relation(fields: [rfqId], references: [id], onDelete: Cascade)
+  vendor         Vendor          @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  items          QuotationItem[]
+  approvals      Approval[]
+  purchaseOrders PurchaseOrder[]
+}
+
+model QuotationItem {
+  id          String @id @default(uuid())
+  quotationId String
+  rfqItemId   String
+  description String
+  quantity    Int
+  unit        String
+  unitPrice   Float
+  taxPercent  Float  @default(0)
+  lineTotal   Float
+
+  quotation Quotation @relation(fields: [quotationId], references: [id], onDelete: Cascade)
+  rfqItem   RFQItem   @relation(fields: [rfqItemId], references: [id], onDelete: Cascade)
 }
 
 model Approval {
-  id           String   @id @default(uuid())
-  quotation_id String   @unique
-  approver_id  String
-  status       ApprovalStatus @default(PENDING)
-  remarks      String?
-  approved_at  DateTime?
+  id          String    @id @default(uuid())
+  quotationId String
+  requestedBy String
+  approvedBy  String?
+  status      String    @default("PENDING") // PENDING, APPROVED, REJECTED
+  remarks     String?
+  requestedAt DateTime  @default(now())
+  actionedAt  DateTime?
 
-  quotation Quotation @relation(fields: [quotation_id], references: [id])
-  approver  User      @relation(fields: [approver_id], references: [id])
+  quotation      Quotation       @relation(fields: [quotationId], references: [id], onDelete: Cascade)
+  purchaseOrders PurchaseOrder[]
 }
 
 model PurchaseOrder {
-  id           String   @id @default(uuid())
-  po_number    String   @unique
-  quotation_id String   @unique
-  vendor_id    String
-  total_amount Decimal
-  status       PoStatus @default(ISSUED)
-  created_at   DateTime @default(now())
+  id                 String   @id @default(uuid())
+  poNumber           String   @unique
+  rfqId              String
+  quotationId        String
+  vendorId           String
+  approvalId         String
+  totalAmount        Float
+  deliveryDeadline   DateTime
+  termsAndConditions String?
+  status             String   @default("ISSUED") // ISSUED, ACKNOWLEDGED, PARTIAL_DELIVERY, DELIVERED, CLOSED
+  createdBy          String
+  createdAt          DateTime @default(now())
 
-  quotation Quotation @relation(fields: [quotation_id], references: [id])
-  vendor    Vendor    @relation(fields: [vendor_id], references: [id])
+  rfq       RFQ       @relation(fields: [rfqId], references: [id], onDelete: Cascade)
+  quotation Quotation @relation(fields: [quotationId], references: [id], onDelete: Cascade)
+  vendor    Vendor    @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  approval  Approval  @relation(fields: [approvalId], references: [id], onDelete: Cascade)
+  items     POItem[]
   invoices  Invoice[]
 }
 
-model Invoice {
-  id             String   @id @default(uuid())
-  invoice_number String   @unique
-  po_id          String   @unique
-  subtotal       Decimal
-  tax_amount     Decimal
-  grand_total    Decimal
-  status         InvoiceStatus @default(DRAFT)
-  created_at     DateTime @default(now())
+model POItem {
+  id              String @id @default(uuid())
+  purchaseOrderId String
+  description     String
+  quantity        Int
+  unit            String
+  unitPrice       Float
+  taxPercent      Float  @default(0)
+  lineTotal       Float
 
-  po PurchaseOrder @relation(fields: [po_id], references: [id])
+  purchaseOrder PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
 }
 
-model Notification {
-  id         String   @id @default(uuid())
-  user_id    String
-  title      String
-  message    String
-  is_read    Boolean  @default(false)
-  created_at DateTime @default(now())
+model Invoice {
+  id              String    @id @default(uuid())
+  invoiceNumber   String    @unique
+  purchaseOrderId String
+  vendorId        String
+  invoiceDate     DateTime
+  dueDate         DateTime
+  paymentTerms    String?
+  subtotal        Float
+  cgstAmount      Float     @default(0)
+  sgstAmount      Float     @default(0)
+  igstAmount      Float     @default(0)
+  grandTotal      Float
+  status          String    @default("PENDING") // PENDING, PAID, OVERDUE, CANCELLED
+  emailSentAt     DateTime?
+  createdAt       DateTime  @default(now())
 
-  user User @relation(fields: [user_id], references: [id])
+  purchaseOrder PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+  vendor        Vendor        @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  items         InvoiceItem[]
+}
+
+model InvoiceItem {
+  id          String @id @default(uuid())
+  invoiceId   String
+  description String
+  quantity    Int
+  unit        String
+  unitPrice   Float
+  taxPercent  Float  @default(0)
+  lineTotal   Float
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
 }
 
 model ActivityLog {
-  id          String   @id @default(uuid())
-  user_id     String
-  action      String
-  entity_type String
-  entity_id   String
-  timestamp   DateTime @default(now())
+  id         String   @id @default(uuid())
+  userId     String?
+  eventType  String
+  entityType String
+  entityId   String
+  message    String
+  metadata   Json?
+  createdAt  DateTime @default(now())
 
-  user User @relation(fields: [user_id], references: [id])
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+model Notification {
+  id            String   @id @default(uuid())
+  userId        String
+  title         String
+  message       String
+  type          String
+  referenceType String?
+  referenceId   String?
+  isRead        Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model QuotationComparisonSnapshot {
+  id                  String   @id @default(uuid())
+  rfqId               String
+  generatedBy         String
+  recommendedVendorId String
+  comparisonScoreJson Json
+  createdAt           DateTime @default(now())
+
+  rfq RFQ @relation(fields: [rfqId], references: [id], onDelete: Cascade)
+}
+
+model PasswordResetOTP {
+  id        String   @id @default(uuid())
+  userId    String
+  otp       String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

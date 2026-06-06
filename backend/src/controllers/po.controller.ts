@@ -1,36 +1,13 @@
-import prisma from '../lib/prisma.js';
+import { Request, Response } from 'express';
+import { POService } from '../services/po.service';
 
-export const getAll = async (req, res, next) => {
-  try {
-    const pos = await prisma.purchaseOrder.findMany({
-      include: { vendor: { select: { name: true } } }
-    });
-    res.json(pos);
-  } catch (err) {
-    next(err);
+export class POController {
+  static async getPOs(req: Request, res: Response) {
+    try {
+      const result = await POService.getAll();
+      res.status(200).json({ data: result });
+    } catch (e: any) {
+      res.status(400).json({ message: e.message });
+    }
   }
-};
-
-export const getOne = async (req, res, next) => {
-  try {
-    const po = await prisma.purchaseOrder.findUnique({
-      where: { id: req.params.id },
-      include: {
-        vendor: true,
-        approval: {
-          include: {
-            quotation: {
-              include: {
-                rfq: true
-              }
-            }
-          }
-        }
-      }
-    });
-    if (!po) return res.status(404).json({ error: 'Purchase Order not found' });
-    res.json(po);
-  } catch (err) {
-    next(err);
-  }
-};
+}
